@@ -1,0 +1,26 @@
+'=====================================
+' Class Module: xl_clsRangeAccessor
+'=====================================
+Option Explicit
+
+' 範囲を配列に取得
+Public Function RangeToArray(ws As Worksheet, rng As Range) As Variant
+    RangeToArray = rng.Value
+End Function
+
+' 配列を範囲に書き込み
+Public Sub ArrayToRange(ws As Worksheet, targetRng As Range, data As Variant)
+    targetRng.Value = data
+End Sub
+
+' 最終行を取得（省略時は1列目）
+Public Function GetLastRow(ws As Worksheet, Optional col As Variant) As Long
+    If IsMissing(col) Then col = 1
+    GetLastRow = ws.Cells(ws.Rows.Count, col).End(xlUp).Row
+End Function
+
+' 最終列を取得（省略時は1行目）
+Public Function GetLastColumn(ws As Worksheet, Optional row As Variant) As Long
+    If IsMissing(row) Then row = 1
+    GetLastColumn = ws.Cells(row, ws.Columns.Count).End(xlToLeft).Column
+End Function
