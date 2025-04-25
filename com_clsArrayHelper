@@ -1,100 +1,185 @@
 '=====================================
 ' Class Module: com_clsArrayHelper
+' 説明　：2次元配列の解析や演算を提供するユーティリティ
+' 作成日：2025/04/25
+' 更新日：-
 '=====================================
+Option Compare Database
 Option Explicit
+
+' --- 内部保持変数 ---
 Private arrData As Variant
 
+'=================================================
+' プロパティ名 : Data
+' 説明          : 操作対象の配列を設定する
+' 引数          : value（Variant）
+' 戻り値        : なし
+'=================================================
 Public Property Let Data(value As Variant)
     arrData = value
-End Property
+End Property ' ← プロパティの終わり
 
-' --- ColIndexer ---
+'=================================================
+' 関数名 : GetColIndex
+' 説明   : 列名から配列内の列番号を取得する
+' 引数   : colName（String）
+' 戻り値 : Long
+'=================================================
 Public Function GetColIndex(colName As String) As Long
     Dim j As Long
     For j = LBound(arrData, 2) To UBound(arrData, 2)
         If arrData(1, j) = colName Then
-            GetColIndex = j: Exit Function
+            GetColIndex = j
+            Exit Function
         End If
     Next j
     GetColIndex = -1
-End Function
+End Function ' ← 関数の終わり
 
-' --- Calculator ---
+'=================================================
+' 関数名 : CalculateOneRow
+' 説明   : 1行の2列を指定演算し結果を返す
+' 引数   : row（Long）, col1（String）, col2（String）, op（String），doRound（Boolean）, digits（Integer）
+' 戻り値 : Double
+'=================================================
 Public Function CalculateOneRow(row As Long, col1 As String, col2 As String, op As String, Optional doRound As Boolean = False, Optional digits As Integer = 0) As Double
-    Dim i1 As Long, i2 As Long: i1 = GetColIndex(col1): i2 = GetColIndex(col2)
+    Dim i1 As Long, i2 As Long
+    i1 = GetColIndex(col1)
+    i2 = GetColIndex(col2)
     If i1 = -1 Or i2 = -1 Then Err.Raise vbObjectError + 100, , "列名が見つかりません"
-    Dim v1 As Double, v2 As Double: v1 = CDbl(arrData(row, i1)): v2 = CDbl(arrData(row, i2))
+    Dim v1 As Double: v1 = CDbl(arrData(row, i1))
+    Dim v2 As Double: v2 = CDbl(arrData(row, i2))
     Dim res As Double
     Select Case op
         Case "add": res = v1 + v2
         Case "sub": res = v1 - v2
         Case "mul": res = v1 * v2
         Case "div": If v2 <> 0 Then res = v1 / v2 Else res = 0
-        Case Else: Err.Raise vbObjectError + 101, , "不正な演算子"
+        Case Else  : Err.Raise vbObjectError + 101, , "不正な演算子"
     End Select
     If doRound And digits >= 0 Then res = Round(res, digits)
     CalculateOneRow = res
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : CalculateIfMatch
+' 説明   : 条件一致時に1行演算を実行する
+' 引数   : row（Long）, condCol（String）, expVal（Variant）, col1（String）, col2（String）, op（String）, doRound（Boolean）, digits（Integer）
+' 戻り値 : Double
+'=================================================
 Public Function CalculateIfMatch(row As Long, condCol As String, expVal As Variant, col1 As String, col2 As String, op As String, Optional doRound As Boolean = False, Optional digits As Integer = 0) As Double
     Dim idx As Long: idx = GetColIndex(condCol)
     If idx = -1 Then Err.Raise vbObjectError + 102, , "条件列が見つかりません"
-    If arrData(row, idx) <> expVal Then CalculateIfMatch = 0: Exit Function
+    If arrData(row, idx) <> expVal Then
+        CalculateIfMatch = 0: Exit Function
+    End If
     CalculateIfMatch = CalculateOneRow(row, col1, col2, op, doRound, digits)
-End Function
+End Function ' ← 関数の終わり
 
-' --- RowFilter ---
+'=================================================
+' 関数名 : IsValueEqual
+' 説明   : 列の値が期待値と等しいか判定する
+' 引数   : row（Long）, colName（String）, expected（Variant）
+' 戻り値 : Boolean
+'=================================================
 Public Function IsValueEqual(row As Long, colName As String, expected As Variant) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     IsValueEqual = (arrData(row, idx) = expected)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : IsBlank
+' 説明   : 値が空文字か判定する
+' 引数   : row（Long）, colName（String）
+' 戻り値 : Boolean
+'=================================================
 Public Function IsBlank(row As Long, colName As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     IsBlank = (Trim(arrData(row, idx) & "") = "")
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : IsGreaterThan
+' 説明   : 閾値より大きいか判定する
+' 引数   : row（Long）, colName（String）, threshold（Double）
+' 戻り値 : Boolean
+'=================================================
 Public Function IsGreaterThan(row As Long, colName As String, threshold As Double) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     If IsNumeric(arrData(row, idx)) Then IsGreaterThan = (arrData(row, idx) > threshold)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : IsBetween
+' 説明   : 範囲内か判定する
+' 引数   : row（Long）, colName（String）, minVal（Double）, maxVal（Double）
+' 戻り値 : Boolean
+'=================================================
 Public Function IsBetween(row As Long, colName As String, minVal As Double, maxVal As Double) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     If IsNumeric(arrData(row, idx)) Then IsBetween = (arrData(row, idx) >= minVal And arrData(row, idx) <= maxVal)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : Contains
+' 説明   : キーワードを含むか判定する
+' 引数   : row（Long）, colName（String）, keyword（String）
+' 戻り値 : Boolean
+'=================================================
 Public Function Contains(row As Long, colName As String, keyword As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     Contains = (InStr(1, arrData(row, idx) & "", keyword, vbTextCompare) > 0)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : StartsWith
+' 説明   : 指定文字列で始まるか判定する
+' 引数   : row（Long）, colName（String）, prefix（String）
+' 戻り値 : Boolean
+'=================================================
 Public Function StartsWith(row As Long, colName As String, prefix As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     StartsWith = (Left(arrData(row, idx) & "", Len(prefix)) = prefix)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : EndsWith
+' 説明   : 指定文字列で終わるか判定する
+' 引数   : row（Long）, colName（String）, suffix（String）
+' 戻り値 : Boolean
+'=================================================
 Public Function EndsWith(row As Long, colName As String, suffix As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     EndsWith = (Right(arrData(row, idx) & "", Len(suffix)) = suffix)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : GetValue
+' 説明   : 値をそのまま返す
+' 引数   : row（Long）, colName（String）
+' 戻り値 : Variant
+'=================================================
 Public Function GetValue(row As Long, colName As String) As Variant
     Dim idx As Long: idx = GetColIndex(colName)
     If idx = -1 Then Exit Function
     GetValue = arrData(row, idx)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' 関数名 : GetNumericValue
+' 説明   : 数値を返す（非数値→0）
+' 引数   : row（Long）, colName（String）
+' 戻り値 : Double
+'=================================================
 Public Function GetNumericValue(row As Long, colName As String) As Double
     Dim v As Variant: v = GetValue(row, colName)
     If IsNumeric(v) Then GetNumericValue = CDbl(v) Else GetNumericValue = 0
-End Function
-
-
+End Function ' ← 関数の終わり
