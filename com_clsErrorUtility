@@ -1,0 +1,86 @@
+'=====================================
+' Class Module: com_clsErrorUtility
+'=====================================
+Option Explicit
+Private pErrors As Collection
+Private pDebugMode As Boolean
+
+' 初期化：エラーコレクション生成 & デバッグモード設定
+Public Sub Initialize(Optional debugMode As Boolean = True)
+    Set pErrors = New Collection
+    pDebugMode = debugMode
+End Sub
+
+' エラーログ追加
+Public Sub LogError(title As String, details As String)
+    Dim msg As String
+    msg = "■■■ " & title & " (" & Now & ") ■■■" & vbCrLf & details
+    If pDebugMode Then Debug.Print msg
+    pErrors.Add msg
+End Sub
+
+' エラーログ表示
+Public Sub ShowAllErrors(Optional showInMsgBox As Boolean = True)
+    Dim errMsg As String
+    Dim i As Long
+    If pErrors.Count = 0 Then
+        If showInMsgBox Then MsgBox "エラーはありません。", vbInformation
+        Exit Sub
+    End If
+    For i = 1 To pErrors.Count
+        errMsg = errMsg & pErrors(i) & vbCrLf
+    Next i
+    If showInMsgBox Then
+        MsgBox errMsg, vbExclamation, "エラー一覧"
+    Else
+        Debug.Print errMsg
+    End If
+End Sub
+
+Public Property Get ErrorCount() As Long
+    ErrorCount = pErrors.Count
+End Property
+
+' デフォルト値取得
+Public Function GetDefaultValue(fieldType As Integer, value As Variant) As Variant
+    On Error Resume Next
+    Select Case fieldType
+        Case dbText, dbMemo
+            If IsNull(value) Or value = "" Then GetDefaultValue = "N/A" Else GetDefaultValue = value
+        Case dbInteger, dbLong, dbByte
+            If IsNull(value) Or Not IsNumeric(value) Then
+                GetDefaultValue = 0
+            ElseIf CDbl(value) < -2147483648# Or CDbl(value) > 2147483647# Then
+                GetDefaultValue = 0
+            Else
+                GetDefaultValue = CLng(value)
+            End If
+        Case dbBigInt
+            If IsNull(value) Or Not IsNumeric(value) Then
+                GetDefaultValue = 0
+            Else
+                GetDefaultValue = CDec(value)
+            End If
+        Case dbDouble, dbSingle, dbCurrency
+            If IsNull(value) Or Not IsNumeric(value) Then
+                GetDefaultValue = 0
+            Else
+                GetDefaultValue = CDbl(value)
+            End If
+        Case dbDate
+            If IsNull(value) Then
+                GetDefaultValue = #1/1/1910#
+            Else
+                GetDefaultValue = value
+            End If
+        Case dbBoolean
+            If IsNull(value) Then
+                GetDefaultValue = False
+            Else
+                GetDefaultValue = CBool(value)
+            End If
+        Case Else
+            GetDefaultValue = Null
+    End Select
+    On Error GoTo 0
+End Function
