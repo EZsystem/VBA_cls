@@ -1,0 +1,22 @@
+'=====================================
+' Class Module: acc_clsDbConnector
+'=====================================
+Option Compare Database
+Option Explicit
+
+Private pDB As DAO.Database
+
+' 初期化：CurrentDb取得
+Public Sub Init()
+    Set pDB = CurrentDb
+End Sub
+
+' DBオブジェクト取得
+Public Property Get DB() As DAO.Database
+    Set DB = pDB
+End Property
+
+' SQL実行ラッパー
+Public Sub ExecuteSQL(sql As String, Optional failOnError As Boolean = True)
+    pDB.Execute sql, IIf(failOnError, dbFailOnError, dbSeeChanges)
+End Sub
