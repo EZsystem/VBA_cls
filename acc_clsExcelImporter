@@ -1,0 +1,97 @@
+'=====================================
+' Class Module: acc_clsExcelImporter
+'=====================================
+Option Compare Database
+Option Explicit
+
+Private pDB As DAO.Database
+Private pDictMapping As Object, pDictValidFields As Object, pColMapping As Object
+Private pSkipConditions As Object, pDefaultValues As Object
+Public tableName As String, TempTableName As String, ImportColumnMax As Long
+
+Public Sub Init()
+    Set pDB = CurrentDb
+    Set pDictMapping = CreateObject("Scripting.Dictionary")
+    Set pDictValidFields = CreateObject("Scripting.Dictionary")
+    Set pColMapping = CreateObject("Scripting.Dictionary")
+End Sub
+
+Public Property Let SkipConditions(val As Object)
+    Set pSkipConditions = val
+End Property
+Public Property Get SkipConditions() As Object
+    Set SkipConditions = pSkipConditions
+End Property
+
+Public Property Set DefaultValues(val As Object)
+    Set pDefaultValues = val
+End Property
+Public Property Get DefaultValues() As Object
+    Set DefaultValues = pDefaultValues
+End Property
+
+' マッピング準備: タイトル行一致か外部テーブル設定
+Public Property Let MappingMode(val As String)
+    Select Case val
+        Case "タイトル一致": Call PrepareMappings_ByTitleMatch_Flexible
+        Case "取込情報テーブル": Call PrepareMappings_ByImportTable
+        Case Else: MsgBox "未対応のMappingMode：" & val, vbCritical
+    End Select
+End Property
+
+' フィールド名配列セット
+Public Property Let fieldNames(val As Variant)
+    PrepareFieldNames val
+End Property
+
+Private Sub PrepareFieldNames(val As Variant)
+    ' 1行目 or 1列目対応等
+    Dim i As Long, title As String
+    For i = 1 To ImportColumnMax
+        title = ""
+        On Error Resume Next
+        title = Trim(Nz(val(1, i), "": val(i, 1)))
+        On Error GoTo 0
+        If title <> "" Then pColMapping.Add i, title
+    Next i
+End Sub
+
+Public Sub ImportFromArray(dataArr As Variant)
+    Dim rs As DAO.Recordset: Set rs = pDB.OpenRecordset(TempTableName, dbOpenDynaset)
+    Dim r As Long, c As Variant, fld As String, valCell As Variant
+
+    For r = 1 To UBound(dataArr, 1)
+        If Not ShouldSkip(dataArr, r) Then
+            rs.AddNew
+            For Each c In pColMapping.Keys
+                fld = pColMapping(c)
+                valCell = dataArr(r, c)
+                If (IsNull(valCell) Or Trim(CStr(valCell))="") And Not pDefaultValues Is Nothing Then
+                    If pDefaultValues.Exists(fld) Then valCell = pDefaultValues(fld)
+                End If
+                rs.Fields(fld).Value = valCell
+            Next c
+            rs.Update
+        End If
+    Next r
+    rs.Close
+End Sub
+
+Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
+    Dim fn As Variant, patterns As Variant, cell As String
+    If pSkipConditions Is Nothing Then Exit Function
+    For Each fn In pSkipConditions.Keys
+        patterns = pSkipConditions(fn)
+        cell = Trim(Nz(dataArr(rowIndex, pColMapping.key), ""))
+        Dim pat
+        For Each pat In patterns
+            If cell Like pat Then
+                ShouldSkip = True: Exit Function
+            End If
+        Next
+    Next
+End Function
+
+Public Sub CommitToMain()
+    pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
+End Sub
