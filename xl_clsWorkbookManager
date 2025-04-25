@@ -1,24 +1,50 @@
 '=====================================
 ' Class Module: xl_clsWorkbookManager
+' 説明　：ワークブックの開閉、保存、および別名保存操作を提供するユーティリティ
+' 作成日：2025/04/25
+' 更新日：-
 '=====================================
 Option Explicit
 
-' ブックを開く（読み取り専用オプション）
+' --- 内部保持変数 ---
+'（このクラスでは内部変数はありません）
+
+'=================================================
+' 関数名 : OpenWorkbook
+' 説明   : 指定パスのワークブックを開く（読み取り専用オプション付き）
+' 引数   : path（String）, ReadOnly（Boolean, Optional）
+' 戻り値 : Workbook
+'=================================================
 Public Function OpenWorkbook(path As String, Optional ReadOnly As Boolean = False) As Workbook
     Set OpenWorkbook = Application.Workbooks.Open(Filename:=path, ReadOnly:=ReadOnly)
-End Function
+End Function ' ← 関数の終わり
 
-' ブックを保存して閉じる
+'=================================================
+' サブルーチン名 : CloseWorkbook
+' 説明          : ワークブックを保存有無を指定して閉じる
+' 引数          : wb（Workbook）, SaveChanges（Boolean, Optional）
+' 戻り値        : なし
+'=================================================
 Public Sub CloseWorkbook(wb As Workbook, Optional SaveChanges As Boolean = False)
     wb.Close SaveChanges:=SaveChanges
-End Sub
+End Sub ' ← サブルーチンの終わり
 
-' ブックを上書き保存
+'=================================================
+' サブルーチン名 : SaveWorkbook
+' 説明          : ワークブックを上書き保存する
+' 引数          : wb（Workbook）
+' 戻り値        : なし
+'=================================================
 Public Sub SaveWorkbook(wb As Workbook)
     wb.Save
-End Sub
+End Sub ' ← サブルーチンの終わり
 
-' ブックを別名保存
+'=================================================
+' サブルーチン名 : SaveWorkbookAs
+' 説明          : ワークブックを別名で保存する
+' 引数          : wb（Workbook）, path（String）
+' 戻り値        : なし
+'=================================================
 Public Sub SaveWorkbookAs(wb As Workbook, path As String)
     wb.SaveAs Filename:=path
-End Sub
+End Sub ' ← サブルーチンの終わり
