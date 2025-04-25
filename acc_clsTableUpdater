@@ -1,49 +1,111 @@
 '=====================================
 ' Class Module: acc_clsTableUpdater
+' 説明　：テーブルのレコードセットを操作しフィールド更新を行うクラス
+' 作成日：2025/04/25
+' 更新日：-
 '=====================================
 Option Compare Database
 Option Explicit
 
-Private pDB As DAO.Database, pTable As String
+' --- 内部保持変数 ---
+Private pDB    As DAO.Database
+Private pTable As String
 
+'=================================================
+' サブルーチン名 : Init
+' 説明          : DAO.Databaseオブジェクトと対象テーブル名を設定する
+' 引数          : tableName（String）
+' 戻り値        : なし
+'=================================================
 Public Sub Init(tableName As String)
-    Set pDB = CurrentDb: pTable = tableName
-End Sub
+    Set pDB = CurrentDb
+    pTable = tableName
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' 関数名 : OpenRS
+' 説明   : 対象テーブルのRecordsetを返す
+' 引数   : なし
+' 戻り値 : DAO.Recordset
+'=================================================
 Private Function OpenRS() As DAO.Recordset
     Set OpenRS = pDB.OpenRecordset(pTable, dbOpenDynaset)
-End Function
+End Function ' ← 関数の終わり
 
+'=================================================
+' サブルーチン名 : UpdateFieldFromField
+' 説明          : 同じレコード内で指定ソースフィールドの値を指定ターゲットフィールドにコピーする
+' 引数          : src（String）, tgt（String）
+' 戻り値        : なし
+'=================================================
 Public Sub UpdateFieldFromField(src As String, tgt As String)
-    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Dim rs As DAO.Recordset
+    Set rs = OpenRS()
     Do Until rs.EOF
-        rs.Edit: rs.Fields(tgt).Value = Nz(rs.Fields(src).Value, Null): rs.Update
+        rs.Edit
+        rs.Fields(tgt).Value = Nz(rs.Fields(src).Value, Null)
+        rs.Update
         rs.MoveNext
-    Loop: rs.Close
-End Sub
+    Loop
+    rs.Close
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' サブルーチン名 : UpdateFieldFromDiff
+' 説明          : 2つのフィールドの差を計算し指定ターゲットフィールドに設定する
+' 引数          : a（String）, b（String）, tgt（String）
+' 戻り値        : なし
+'=================================================
 Public Sub UpdateFieldFromDiff(a As String, b As String, tgt As String)
-    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Dim rs As DAO.Recordset
+    Set rs = OpenRS()
     Do Until rs.EOF
-        rs.Edit: rs.Fields(tgt).Value = Nz(rs.Fields(a).Value, 0) - Nz(rs.Fields(b).Value,0): rs.Update
+        rs.Edit
+        rs.Fields(tgt).Value = Nz(rs.Fields(a).Value, 0) - Nz(rs.Fields(b).Value, 0)
+        rs.Update
         rs.MoveNext
-    Loop: rs.Close
-End Sub
+    Loop
+    rs.Close
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' サブルーチン名 : UpdateFieldByConcat
+' 説明          : 2つのフィールドを文字列結合し指定ターゲットフィールドに設定する
+' 引数          : a（String）, b（String）, tgt（String）
+' 戻り値        : なし
+'=================================================
 Public Sub UpdateFieldByConcat(a As String, b As String, tgt As String)
-    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Dim rs As DAO.Recordset
+    Set rs = OpenRS()
     Do Until rs.EOF
-        rs.Edit: rs.Fields(tgt).Value = Nz(rs.Fields(a).Value,"") & "_" & Nz(rs.Fields(b).Value,""): rs.Update
+        rs.Edit
+        rs.Fields(tgt).Value = Nz(rs.Fields(a).Value, "") & "_" & Nz(rs.Fields(b).Value, "")
+        rs.Update
         rs.MoveNext
-    Loop: rs.Close
-End Sub
+    Loop
+    rs.Close
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' サブルーチン名 : UpdateFieldWithCondition
+' 説明          : 条件に応じて直接値または関数実行結果を指定ターゲットフィールドに設定する
+' 引数          : condField（String）, condVal（String）, tgt（String）, valField（String）, altFunc（String）
+' 戻り値        : なし
+'=================================================
 Public Sub UpdateFieldWithCondition(condField As String, condVal As String, tgt As String, valField As String, altFunc As String)
-    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Dim rs As DAO.Recordset
+    Set rs = OpenRS()
     Do Until rs.EOF
         Dim v As Variant
-        If Nz(rs.Fields(condField).Value,"")=condVal Then v = Nz(rs.Fields(valField).Value,0) Else v = Application.Run(altFunc,rs)
-        rs.Edit: rs.Fields(tgt).Value = v: rs.Update
+        If Nz(rs.Fields(condField).Value, "") = condVal Then
+            v = Nz(rs.Fields(valField).Value, 0)
+        Else
+            v = Application.Run(altFunc, rs)
+        End If
+        rs.Edit
+        rs.Fields(tgt).Value = v
+        rs.Update
         rs.MoveNext
-    Loop: rs.Close
-End Sub
+    Loop
+    rs.Close
+End Sub ' ← サブルーチンの終わり
