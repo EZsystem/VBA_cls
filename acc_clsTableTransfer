@@ -1,33 +1,69 @@
 '=====================================
 ' Class Module: acc_clsTableTransfer
+' 説明　：指定テーブル間のデータ削除および挿入による転送機能を提供するクラス
+' 作成日：2025/04/25
+' 更新日：-
 '=====================================
 Option Compare Database
 Option Explicit
 
-Private pDB As DAO.Database, pSettings As Collection
+' --- 内部保持変数 ---
+Private pDB        As DAO.Database
+Private pSettings  As Collection
 
+'=================================================
+' サブルーチン名 : Init
+' 説明          : DAO.Databaseオブジェクトを設定し、設定コレクションを初期化する
+' 引数          : db（DAO.Database, Optional）
+' 戻り値        : なし
+'=================================================
 Public Sub Init(Optional db As DAO.Database)
-    If db Is Nothing Then Set pDB = CurrentDb Else Set pDB = db
+    If db Is Nothing Then
+        Set pDB = CurrentDb
+    Else
+        Set pDB = db
+    End If
     Set pSettings = New Collection
-End Sub
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' サブルーチン名 : AddSetting
+' 説明          : 転送元テーブル、転送先テーブル、キー項目を設定に追加する
+' 引数          : srcTable（String）, tgtTable（String）, keyField（String）
+' 戻り値        : なし
+'=================================================
 Public Sub AddSetting(srcTable As String, tgtTable As String, keyField As String)
-    Dim s As Collection: Set s = New Collection
-    s.Add srcTable, "Source": s.Add tgtTable, "Target": s.Add keyField, "Key"
-    pSettings.Add s
-End Sub
+    Dim setting As Collection
+    Set setting = New Collection
+    setting.Add srcTable, "Source"
+    setting.Add tgtTable, "Target"
+    setting.Add keyField, "Key"
+    pSettings.Add setting
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' サブルーチン名 : ExecuteAll
+' 説明          : 設定されたすべての転送設定を実行する
+' 引数          : なし
+' 戻り値        : なし
+'=================================================
 Public Sub ExecuteAll()
-    Dim s As Collection
-    For Each s In pSettings
-        TransferTable CStr(s("Source")), CStr(s("Target")), CStr(s("Key"))
+    Dim setting As Collection
+    For Each setting In pSettings
+        TransferTable CStr(setting("Source")), CStr(setting("Target")), CStr(setting("Key"))
     Next
-End Sub
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' サブルーチン名 : TransferTable
+' 説明          : 単一のテーブル間でキー項目に一致するレコードを削除し、挿入する
+' 引数          : src（String）, tgt（String）, key（String）
+' 戻り値        : なし
+'=================================================
 Private Sub TransferTable(src As String, tgt As String, key As String)
     Dim sqlDel As String, sqlIns As String
     sqlDel = "DELETE FROM [" & tgt & "] WHERE [" & key & "] IN (SELECT [" & key & "] FROM [" & src & "]);"
     pDB.Execute sqlDel, dbFailOnError
     sqlIns = "INSERT INTO [" & tgt & "] SELECT * FROM [" & src & "];"
     pDB.Execute sqlIns, dbFailOnError
-End Sub
+End Sub ' ← サブルーチンの終わり
