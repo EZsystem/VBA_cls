@@ -1,36 +1,72 @@
 '=====================================
 ' Class Module: acc_clsExcelImporter
+' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス
+' 作成日：2025/04/25
+' 更新日：-
 '=====================================
 Option Compare Database
 Option Explicit
 
-Private pDB As DAO.Database
-Private pDictMapping As Object, pDictValidFields As Object, pColMapping As Object
-Private pSkipConditions As Object, pDefaultValues As Object
-Public tableName As String, TempTableName As String, ImportColumnMax As Long
+' --- 内部保持変数 ---
+Private pDB               As DAO.Database
+Private pDictMapping      As Object
+Private pDictValidFields  As Object
+Private pColMapping       As Object
+Private pSkipConditions   As Object
+Private pDefaultValues    As Object
 
+' --- 公開プロパティ ---
+Public tableName       As String
+Public TempTableName   As String
+Public ImportColumnMax As Long
+
+'=================================================
+' サブルーチン名 : Init
+' 説明          : DAO.Databaseオブジェクトとマッピング辞書を初期化する
+' 引数          : なし
+' 戻り値        : なし
+'=================================================
 Public Sub Init()
-    Set pDB = CurrentDb
-    Set pDictMapping = CreateObject("Scripting.Dictionary")
+    Set pDB              = CurrentDb
+    Set pDictMapping     = CreateObject("Scripting.Dictionary")
     Set pDictValidFields = CreateObject("Scripting.Dictionary")
-    Set pColMapping = CreateObject("Scripting.Dictionary")
-End Sub
+    Set pColMapping      = CreateObject("Scripting.Dictionary")
+End Sub ' ← サブルーチンの終わり
 
+'=================================================
+' プロパティ名 : SkipConditions
+' 説明          : スキップ条件辞書を設定または取得する
+' 引数          : val（Object）
+' 戻り値        : Object
+'=================================================
 Public Property Let SkipConditions(val As Object)
     Set pSkipConditions = val
-End Property
+End Property ' ← プロパティの終わり
+
 Public Property Get SkipConditions() As Object
     Set SkipConditions = pSkipConditions
-End Property
+End Property ' ← プロパティの終わり
 
+'=================================================
+' プロパティ名 : DefaultValues
+' 説明          : デフォルト値辞書を設定または取得する
+' 引数          : val（Object）
+' 戻り値        : Object
+'=================================================
 Public Property Set DefaultValues(val As Object)
     Set pDefaultValues = val
 End Property
+
 Public Property Get DefaultValues() As Object
     Set DefaultValues = pDefaultValues
 End Property
 
-' マッピング準備: タイトル行一致か外部テーブル設定
+'=================================================
+' プロパティ名 : MappingMode
+' 説明          : マッピングモードを設定し、対応処理を実行する
+' 引数          : val（String）
+' 戻り値        : なし
+'=================================================
 Public Property Let MappingMode(val As String)
     Select Case val
         Case "タイトル一致": Call PrepareMappings_ByTitleMatch_Flexible
@@ -39,26 +75,43 @@ Public Property Let MappingMode(val As String)
     End Select
 End Property
 
-' フィールド名配列セット
+'=================================================
+' プロパティ名 : fieldNames
+' 説明          : フィールド名配列を設定し内部マッピングを準備する
+' 引数          : val（Variant）
+' 戻り値        : なし
+'=================================================
 Public Property Let fieldNames(val As Variant)
     PrepareFieldNames val
 End Property
 
 Private Sub PrepareFieldNames(val As Variant)
-    ' 1行目 or 1列目対応等
-    Dim i As Long, title As String
+    Dim i     As Long
+    Dim title As String
     For i = 1 To ImportColumnMax
         title = ""
         On Error Resume Next
-        title = Trim(Nz(val(1, i), "": val(i, 1)))
+        title = Trim(Nz(val(1, i), ""))     ' 1行目タイトル
+        If title = "" Then _
+            title = Trim(Nz(val(i, 1), ""))  ' 1列目対応
         On Error GoTo 0
         If title <> "" Then pColMapping.Add i, title
     Next i
 End Sub
 
+'=================================================
+' サブルーチン名 : ImportFromArray
+' 説明          : 配列データをテンポラリテーブルに取り込む
+' 引数          : dataArr（Variant）
+' 戻り値        : なし
+'=================================================
 Public Sub ImportFromArray(dataArr As Variant)
-    Dim rs As DAO.Recordset: Set rs = pDB.OpenRecordset(TempTableName, dbOpenDynaset)
-    Dim r As Long, c As Variant, fld As String, valCell As Variant
+    Dim rs      As DAO.Recordset
+    Set rs = pDB.OpenRecordset(TempTableName, dbOpenDynaset)
+    Dim r       As Long
+    Dim c       As Variant
+    Dim fld     As String
+    Dim valCell As Variant
 
     For r = 1 To UBound(dataArr, 1)
         If Not ShouldSkip(dataArr, r) Then
@@ -66,8 +119,11 @@ Public Sub ImportFromArray(dataArr As Variant)
             For Each c In pColMapping.Keys
                 fld = pColMapping(c)
                 valCell = dataArr(r, c)
-                If (IsNull(valCell) Or Trim(CStr(valCell))="") And Not pDefaultValues Is Nothing Then
-                    If pDefaultValues.Exists(fld) Then valCell = pDefaultValues(fld)
+                If (IsNull(valCell) Or Trim(CStr(valCell)) = "") Then
+                    If Not pDefaultValues Is Nothing Then
+                        If pDefaultValues.Exists(fld) Then _
+                            valCell = pDefaultValues(fld)
+                    End If
                 End If
                 rs.Fields(fld).Value = valCell
             Next c
@@ -75,23 +131,32 @@ Public Sub ImportFromArray(dataArr As Variant)
         End If
     Next r
     rs.Close
-End Sub
+End Sub ' ← サブルーチンの終わり
 
 Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
-    Dim fn As Variant, patterns As Variant, cell As String
+    Dim fn       As Variant
+    Dim patterns As Variant
+    Dim cell     As String
     If pSkipConditions Is Nothing Then Exit Function
     For Each fn In pSkipConditions.Keys
         patterns = pSkipConditions(fn)
-        cell = Trim(Nz(dataArr(rowIndex, pColMapping.key), ""))
-        Dim pat
+        cell = Trim(Nz(dataArr(rowIndex, pColMapping(fn)), ""))
+        Dim pat As Variant
         For Each pat In patterns
             If cell Like pat Then
-                ShouldSkip = True: Exit Function
+                ShouldSkip = True
+                Exit Function
             End If
-        Next
-    Next
-End Function
+        Next pat
+    Next fn
+End Function ' ← 関数の終わり
 
+'=================================================
+' サブルーチン名 : CommitToMain
+' 説明          : テンポラリテーブルからメインテーブルへデータを挿入する
+' 引数          : なし
+' 戻り値        : なし
+'=================================================
 Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
-End Sub
+End Sub ' ← サブルーチンの終わり
