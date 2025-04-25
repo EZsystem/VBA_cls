@@ -1,0 +1,84 @@
+'=====================================
+' Class Module: com_clsDateMath
+'=====================================
+Option Explicit
+Private pRawValue As String
+Private pYear As Integer, pMonth As Integer, pDay As Integer
+Private pIsValid As Boolean
+Private Const BASE_YEAR As Integer = 2012
+
+Public Property Let rawValue(v As String)
+    pRawValue = Trim(v)
+    ParseValue
+End Property
+
+Public Property Get rawValue() As String
+    rawValue = pRawValue
+End Property
+
+Public Property Get IsValid() As Boolean
+    IsValid = pIsValid
+End Property
+
+Public Function GetYear() As Integer: GetYear = pYear: End Function
+Public Function GetMonth() As Integer: GetMonth = pMonth: End Function
+Public Function GetDay() As Integer: GetDay = pDay: End Function
+
+Public Function GetDateValue() As Variant
+    If pIsValid Then
+        GetDateValue = DateSerial(pYear, pMonth, pDay)
+    Else
+        GetDateValue = Null
+    End If
+End Function
+
+Public Function GetFiscalYear() As Integer
+    Dim fy As Integer: fy = pYear
+    If pMonth >= 1 And pMonth <= 3 Then fy = fy - 1
+    GetFiscalYear = fy
+End Function
+
+Public Function GetPeriod() As Integer
+    GetPeriod = GetFiscalYear() - BASE_YEAR
+End Function
+
+Public Function GetQuarter() As Integer
+    Select Case pMonth
+        Case 4 To 6: GetQuarter = 1
+        Case 7 To 9: GetQuarter = 2
+        Case 10 To 12: GetQuarter = 3
+        Case 1 To 3: GetQuarter = 4
+        Case Else: GetQuarter = 0
+    End Select
+End Function
+
+Private Sub ParseValue()
+    Dim s As String: s = pRawValue
+    pIsValid = False
+    If Len(s) = 6 Then
+        On Error GoTo ErrLbl
+        pYear = CInt(Left(s, 4)): pMonth = CInt(Right(s, 2)): pDay = 1
+        pIsValid = ValidateDate(pYear, pMonth, pDay)
+    ElseIf Len(s) = 8 Then
+        On Error GoTo ErrLbl
+        pYear = CInt(Left(s, 4)): pMonth = CInt(Mid(s, 5, 2)): pDay = CInt(Right(s, 2))
+        pIsValid = ValidateDate(pYear, pMonth, pDay)
+    End If
+    Exit Sub
+ErrLbl:
+    pIsValid = False
+End Sub
+
+Private Function ValidateDate(y As Integer, m As Integer, d As Integer) As Boolean
+    On Error GoTo ErrLbl2
+    Dim dt As Date: dt = DateSerial(y, m, d)
+    ValidateDate = True
+    Exit Function
+ErrLbl2:
+    ValidateDate = False
+End Function
+
+Public Function RoundToDigits(val As Variant, digits As Long) As Double
+    Dim factor As Double: factor = 10 ^ digits
+    RoundToDigits = Round(CDbl(val) * factor, 0) / factor
+End Function
