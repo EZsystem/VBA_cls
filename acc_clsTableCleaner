@@ -1,0 +1,21 @@
+'=====================================
+' Class Module: acc_clsTableCleaner
+'=====================================
+Option Compare Database
+Option Explicit
+
+Private pDB As DAO.Database, pTables As Collection
+
+Public Sub Init()
+    Set pDB = CurrentDb: Set pTables = New Collection
+End Sub
+
+Public Sub AddTable(tableName As String)
+    pTables.Add tableName
+End Sub
+
+Public Sub ClearAll()
+    Dim t: For Each t In pTables
+        pDB.Execute "DELETE FROM [" & t & "];", dbFailOnError
+    Next
+End Sub
