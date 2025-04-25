@@ -1,0 +1,24 @@
+'=====================================
+' Class Module: xl_clsWorkbookManager
+'=====================================
+Option Explicit
+
+' ブックを開く（読み取り専用オプション）
+Public Function OpenWorkbook(path As String, Optional ReadOnly As Boolean = False) As Workbook
+    Set OpenWorkbook = Application.Workbooks.Open(Filename:=path, ReadOnly:=ReadOnly)
+End Function
+
+' ブックを保存して閉じる
+Public Sub CloseWorkbook(wb As Workbook, Optional SaveChanges As Boolean = False)
+    wb.Close SaveChanges:=SaveChanges
+End Sub
+
+' ブックを上書き保存
+Public Sub SaveWorkbook(wb As Workbook)
+    wb.Save
+End Sub
+
+' ブックを別名保存
+Public Sub SaveWorkbookAs(wb As Workbook, path As String)
+    wb.SaveAs Filename:=path
+End Sub
