@@ -1,0 +1,32 @@
+'=====================================
+' Class Module: xl_clsSheetManager
+'=====================================
+Option Explicit
+
+' 指定ワークブック内にシートが存在するかチェック
+Public Function SheetExists(wb As Workbook, sheetName As String) As Boolean
+    On Error Resume Next
+    Dim ws As Worksheet
+    Set ws = wb.Worksheets(sheetName)
+    SheetExists = (Err.Number = 0)
+    On Error GoTo 0
+End Function
+
+' シートを取得（存在しなければエラーを発生）
+Public Function GetSheet(wb As Workbook, sheetName As String) As Worksheet
+    If SheetExists(wb, sheetName) Then
+        Set GetSheet = wb.Worksheets(sheetName)
+    Else
+        Err.Raise vbObjectError + 1000, , "シートが存在しません: " & sheetName
+    End If
+End Function
+
+' シート保護を解除（パスワード省略可）
+Public Sub UnprotectSheet(ws As Worksheet, Optional password As String = "")
+    If ws.ProtectContents Then ws.Unprotect password
+End Sub
+
+' シート保護（パスワード・オプション指定可）
+Public Sub ProtectSheet(ws As Worksheet, Optional password As String = "", Optional DrawingObjects As Boolean = True, Optional Contents As Boolean = True, Optional Scenarios As Boolean = True)
+    ws.Protect password:=password, DrawingObjects:=DrawingObjects, Contents:=Contents, Scenarios:=Scenarios
+End Sub
