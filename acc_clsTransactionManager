@@ -1,0 +1,35 @@
+'=====================================
+' Class Module: acc_clsTransactionManager
+'=====================================
+Option Compare Database
+Option Explicit
+
+Private pDB As DAO.Database
+Private pInTransaction As Boolean
+
+' 初期化：DBオブジェクト設定
+Public Sub Init(db As DAO.Database)
+    Set pDB = db
+    pInTransaction = False
+End Sub
+
+Public Sub BeginTransaction()
+    If Not pInTransaction Then
+        pDB.BeginTrans
+        pInTransaction = True
+    End If
+End Sub
+
+Public Sub Commit()
+    If pInTransaction Then
+        pDB.CommitTrans
+        pInTransaction = False
+    End If
+End Sub
+
+Public Sub Rollback()
+    If pInTransaction Then
+        pDB.Rollback
+        pInTransaction = False
+    End If
+End Sub
