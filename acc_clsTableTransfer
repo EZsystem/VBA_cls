@@ -1,0 +1,33 @@
+'=====================================
+' Class Module: acc_clsTableTransfer
+'=====================================
+Option Compare Database
+Option Explicit
+
+Private pDB As DAO.Database, pSettings As Collection
+
+Public Sub Init(Optional db As DAO.Database)
+    If db Is Nothing Then Set pDB = CurrentDb Else Set pDB = db
+    Set pSettings = New Collection
+End Sub
+
+Public Sub AddSetting(srcTable As String, tgtTable As String, keyField As String)
+    Dim s As Collection: Set s = New Collection
+    s.Add srcTable, "Source": s.Add tgtTable, "Target": s.Add keyField, "Key"
+    pSettings.Add s
+End Sub
+
+Public Sub ExecuteAll()
+    Dim s As Collection
+    For Each s In pSettings
+        TransferTable CStr(s("Source")), CStr(s("Target")), CStr(s("Key"))
+    Next
+End Sub
+
+Private Sub TransferTable(src As String, tgt As String, key As String)
+    Dim sqlDel As String, sqlIns As String
+    sqlDel = "DELETE FROM [" & tgt & "] WHERE [" & key & "] IN (SELECT [" & key & "] FROM [" & src & "]);"
+    pDB.Execute sqlDel, dbFailOnError
+    sqlIns = "INSERT INTO [" & tgt & "] SELECT * FROM [" & src & "];"
+    pDB.Execute sqlIns, dbFailOnError
+End Sub
