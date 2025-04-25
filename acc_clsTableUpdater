@@ -1,0 +1,49 @@
+'=====================================
+' Class Module: acc_clsTableUpdater
+'=====================================
+Option Compare Database
+Option Explicit
+
+Private pDB As DAO.Database, pTable As String
+
+Public Sub Init(tableName As String)
+    Set pDB = CurrentDb: pTable = tableName
+End Sub
+
+Private Function OpenRS() As DAO.Recordset
+    Set OpenRS = pDB.OpenRecordset(pTable, dbOpenDynaset)
+End Function
+
+Public Sub UpdateFieldFromField(src As String, tgt As String)
+    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Do Until rs.EOF
+        rs.Edit: rs.Fields(tgt).Value = Nz(rs.Fields(src).Value, Null): rs.Update
+        rs.MoveNext
+    Loop: rs.Close
+End Sub
+
+Public Sub UpdateFieldFromDiff(a As String, b As String, tgt As String)
+    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Do Until rs.EOF
+        rs.Edit: rs.Fields(tgt).Value = Nz(rs.Fields(a).Value, 0) - Nz(rs.Fields(b).Value,0): rs.Update
+        rs.MoveNext
+    Loop: rs.Close
+End Sub
+
+Public Sub UpdateFieldByConcat(a As String, b As String, tgt As String)
+    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Do Until rs.EOF
+        rs.Edit: rs.Fields(tgt).Value = Nz(rs.Fields(a).Value,"") & "_" & Nz(rs.Fields(b).Value,""): rs.Update
+        rs.MoveNext
+    Loop: rs.Close
+End Sub
+
+Public Sub UpdateFieldWithCondition(condField As String, condVal As String, tgt As String, valField As String, altFunc As String)
+    Dim rs As DAO.Recordset: Set rs = OpenRS()
+    Do Until rs.EOF
+        Dim v As Variant
+        If Nz(rs.Fields(condField).Value,"")=condVal Then v = Nz(rs.Fields(valField).Value,0) Else v = Application.Run(altFunc,rs)
+        rs.Edit: rs.Fields(tgt).Value = v: rs.Update
+        rs.MoveNext
+    Loop: rs.Close
+End Sub
