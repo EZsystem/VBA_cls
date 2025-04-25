@@ -1,0 +1,28 @@
+'=====================================
+' Class Module: com_clsStringHelper
+'=====================================
+Option Explicit
+
+Public Function SplitToArray(s As String, delimiter As String) As Variant
+    SplitToArray = Split(s, delimiter)
+End Function
+
+Public Function JoinArray(arr As Variant, delimiter As String) As String
+    JoinArray = Join(arr, delimiter)
+End Function
+
+Public Function ToUpper(s As String) As String
+    ToUpper = UCase(s)
+End Function
+
+Public Function ToLower(s As String) As String
+    ToLower = LCase(s)
+End Function
+
+Public Function ContainsText(s As String, keyword As String) As Boolean
+    ContainsText = (InStr(1, s, keyword, vbTextCompare) > 0)
+End Function
+
+Public Function ReplaceAll(s As String, find As String, repl As String) As String
+    ReplaceAll = Replace(s, find, repl)
+End Function
