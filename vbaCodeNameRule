@@ -6,17 +6,14 @@ acc_:Access用
 xl_ :Excel用
 com_:共通ユーティリティー
 例：
-acc_cls_excelImporter
+acc_clsExcelImporter
 
 ２．クラス、標準モジュールで分ける場合
-cls_:クラスモジュール
-mod_:標準モジュール
-frm_:フォーム
-例：
-acc_cls_excelImporter
+cls:クラスモジュール
+mod:標準モジュール
+frm:フォーム
 
 ３．区切りはスネークケース（_区切り）とする
-
 
 ４．単語連結には camelCase（キャメルケース）を使用すること
 
