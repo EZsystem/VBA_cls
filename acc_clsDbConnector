@@ -1,22 +1,41 @@
 '=====================================
 ' Class Module: acc_clsDbConnector
+' 説明　：DAO.Database取得およびSQL実行ラッパーを提供するクラス
+' 作成日：2025/04/25
+' 更新日：-
 '=====================================
 Option Compare Database
 Option Explicit
 
+' --- 内部保持変数 ---
 Private pDB As DAO.Database
 
-' 初期化：CurrentDb取得
+'=================================================
+' サブルーチン名 : Init
+' 説明          : CurrentDbを取得し、DAO.Databaseオブジェクトを設定する
+' 引数          : なし
+' 戻り値        : なし
+'=================================================
 Public Sub Init()
     Set pDB = CurrentDb
-End Sub
+End Sub ' ← サブルーチンの終わり
 
-' DBオブジェクト取得
+'=================================================
+' プロパティ名 : DB
+' 説明          : 内部保持しているDAO.Databaseオブジェクトを返す
+' 引数          : なし
+' 戻り値        : DAO.Database
+'=================================================
 Public Property Get DB() As DAO.Database
     Set DB = pDB
-End Property
+End Property ' ← プロパティの終わり
 
-' SQL実行ラッパー
+'=================================================
+' サブルーチン名 : ExecuteSQL
+' 説明          : SQL文を実行する（エラー時の動作指定可）
+' 引数          : sql（String）, failOnError（Boolean, Optional）
+' 戻り値        : なし
+'=================================================
 Public Sub ExecuteSQL(sql As String, Optional failOnError As Boolean = True)
     pDB.Execute sql, IIf(failOnError, dbFailOnError, dbSeeChanges)
-End Sub
+End Sub ' ← サブルーチンの終わり
