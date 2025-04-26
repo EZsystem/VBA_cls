@@ -2,7 +2,7 @@
 ' Class Module: acc_clsExcelImporter
 ' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -22,36 +22,27 @@ Public ImportColumnMax As Long
 
 '=================================================
 ' サブルーチン名 : Init
-' 説明          : DAO.Databaseオブジェクトとマッピング辞書を初期化する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub Init()
     Set pDB              = CurrentDb
     Set pDictMapping     = CreateObject("Scripting.Dictionary")
     Set pDictValidFields = CreateObject("Scripting.Dictionary")
     Set pColMapping      = CreateObject("Scripting.Dictionary")
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' プロパティ名 : SkipConditions
-' 説明          : スキップ条件辞書を設定または取得する
-' 引数          : val（Object）
-' 戻り値        : Object
 '=================================================
 Public Property Let SkipConditions(val As Object)
     Set pSkipConditions = val
-End Property ' ← プロパティの終わり
+End Property
 
 Public Property Get SkipConditions() As Object
     Set SkipConditions = pSkipConditions
-End Property ' ← プロパティの終わり
+End Property
 
 '=================================================
 ' プロパティ名 : DefaultValues
-' 説明          : デフォルト値辞書を設定または取得する
-' 引数          : val（Object）
-' 戻り値        : Object
 '=================================================
 Public Property Set DefaultValues(val As Object)
     Set pDefaultValues = val
@@ -63,9 +54,6 @@ End Property
 
 '=================================================
 ' プロパティ名 : MappingMode
-' 説明          : マッピングモードを設定し、対応処理を実行する
-' 引数          : val（String）
-' 戻り値        : なし
 '=================================================
 Public Property Let MappingMode(val As String)
     Select Case val
@@ -77,14 +65,14 @@ End Property
 
 '=================================================
 ' プロパティ名 : fieldNames
-' 説明          : フィールド名配列を設定し内部マッピングを準備する
-' 引数          : val（Variant）
-' 戻り値        : なし
 '=================================================
 Public Property Let fieldNames(val As Variant)
     PrepareFieldNames val
 End Property
 
+'=================================================
+' サブルーチン名 : PrepareFieldNames
+'=================================================
 Private Sub PrepareFieldNames(val As Variant)
     Dim i     As Long
     Dim title As String
@@ -101,9 +89,6 @@ End Sub
 
 '=================================================
 ' サブルーチン名 : ImportFromArray
-' 説明          : 配列データをテンポラリテーブルに取り込む
-' 引数          : dataArr（Variant）
-' 戻り値        : なし
 '=================================================
 Public Sub ImportFromArray(dataArr As Variant)
     Dim rs      As DAO.Recordset
@@ -131,8 +116,11 @@ Public Sub ImportFromArray(dataArr As Variant)
         End If
     Next r
     rs.Close
-End Sub ' ← サブルーチンの終わり
+End Sub
 
+'=================================================
+' 関数名 : ShouldSkip
+'=================================================
 Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
     Dim fn       As Variant
     Dim patterns As Variant
@@ -149,14 +137,11 @@ Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
             End If
         Next pat
     Next fn
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' サブルーチン名 : CommitToMain
-' 説明          : テンポラリテーブルからメインテーブルへデータを挿入する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
-End Sub ' ← サブルーチンの終わり
+End Sub
