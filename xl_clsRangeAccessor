@@ -2,7 +2,7 @@
 ' Class Module: xl_clsRangeAccessor
 ' 説明　：ワークシート範囲と配列間の相互変換および最終行・最終列取得を提供するユーティリティ
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Explicit
 
@@ -11,42 +11,30 @@ Option Explicit
 
 '=================================================
 ' 関数名 : RangeToArray
-' 説明   : 指定範囲の値を2次元配列として返す
-' 引数   : ws（Worksheet）, rng（Range）
-' 戻り値 : Variant
 '=================================================
 Public Function RangeToArray(ws As Worksheet, rng As Range) As Variant
     RangeToArray = rng.Value
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' サブルーチン名 : ArrayToRange
-' 説明          : 配列の値を指定範囲に書き込む
-' 引数          : ws（Worksheet）, targetRng（Range）, data（Variant）
-' 戻り値        : なし
 '=================================================
 Public Sub ArrayToRange(ws As Worksheet, targetRng As Range, data As Variant)
     targetRng.Value = data
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' 関数名 : GetLastRow
-' 説明   : 指定列（省略時は1列目）の最終行番号を返す
-' 引数   : ws（Worksheet）, col（Variant, Optional）
-' 戻り値 : Long
 '=================================================
 Public Function GetLastRow(ws As Worksheet, Optional col As Variant) As Long
     If IsMissing(col) Then col = 1
     GetLastRow = ws.Cells(ws.Rows.Count, col).End(xlUp).Row
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetLastColumn
-' 説明   : 指定行（省略時は1行目）の最終列番号を返す
-' 引数   : ws（Worksheet）, row（Variant, Optional）
-' 戻り値 : Long
 '=================================================
 Public Function GetLastColumn(ws As Worksheet, Optional row As Variant) As Long
     If IsMissing(row) Then row = 1
     GetLastColumn = ws.Cells(row, ws.Columns.Count).End(xlToLeft).Column
-End Function ' ← 関数の終わり
+End Function
