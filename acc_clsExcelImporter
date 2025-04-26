@@ -17,6 +17,10 @@ Private pDefaultValues    As Object
 Private pImportTableName As String
 Private pImportSourceFieldName As String
 Private pImportTargetFieldName As String
+Public TitleRow As Long             ' タイトル行（例：5）
+Public DataStartRow As Long        ' データ開始行（例：6）
+Public StartColumn As Long         ' データ開始列（例：2 = B列）
+Public ImportColumnMax As Long     ' 最大列数（B〜EK = 144列）
 
 ' --- 公開プロパティ ---
 Public tableName       As String
@@ -192,3 +196,30 @@ End Function
 Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
 End Sub
+
+'=================================================
+' サブルーチン名 : ImportFromWorksheet
+' 引数：ws - 取込対象のワークシート（Excel.Worksheet）
+' 機能：指定行列からタイトルとデータを取得し、ImportFromArray に渡す
+'=================================================
+Public Sub ImportFromWorksheet(ws As Object)
+    Dim lastRow As Long
+    Dim titleArr As Variant
+    Dim dataArr As Variant
+
+    ' --- タイトル読み込み ---
+    Set pColMapping = CreateObject("Scripting.Dictionary")
+    titleArr = ws.Range(ws.Cells(TitleRow, StartColumn), ws.Cells(TitleRow, StartColumn + ImportColumnMax - 1)).Value
+    fieldNames = titleArr
+
+    ' --- データ最終行取得 ---
+    lastRow = ws.Cells(ws.Rows.Count, StartColumn).End(-4162).Row
+
+    ' --- データ読み込み ---
+    dataArr = ws.Range(ws.Cells(DataStartRow, StartColumn), ws.Cells(lastRow, StartColumn + ImportColumnMax - 1)).Value
+
+    ' --- 配列から取込実行 ---
+    ImportFromArray dataArr
+End Sub
+
+' --- 既存の関数群（Init, ImportFromArray, プロパティ定義など）はそのまま続く ---
