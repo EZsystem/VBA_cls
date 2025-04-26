@@ -2,7 +2,7 @@
 ' Class Module: com_clsDateMath
 ' 説明　：日付文字列の解析や期間計算を行うユーティリティ
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -17,70 +17,46 @@ Private Const BASE_YEAR As Integer = 2012
 
 '=================================================
 ' プロパティ名 : rawValue
-' 説明          : 入力文字列を設定し、解析を実行する
-' 引数          : v（String）
-' 戻り値        : なし
 '=================================================
 Public Property Let rawValue(v As String)
     pRawValue = Trim(v)
     ParseValue
-End Property ' ← プロパティの終わり
+End Property
 
-'=================================================
-' プロパティ名 : rawValue
-' 説明          : 設定された文字列を返す
-' 引数          : なし
-' 戻り値        : String
-'=================================================
 Public Property Get rawValue() As String
     rawValue = pRawValue
-End Property ' ← プロパティの終わり
+End Property
 
 '=================================================
 ' プロパティ名 : IsValid
-' 説明          : 解析結果が有効かを返す
-' 引数          : なし
-' 戻り値        : Boolean
 '=================================================
 Public Property Get IsValid() As Boolean
     IsValid = pIsValid
-End Property ' ← プロパティの終わり
+End Property
 
 '=================================================
 ' 関数名 : GetYear
-' 説明   : 解析した年を返す
-' 引数   : なし
-' 戻り値 : Integer
 '=================================================
 Public Function GetYear() As Integer
     GetYear = pYear
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetMonth
-' 説明   : 解析した月を返す
-' 引数   : なし
-' 戻り値 : Integer
 '=================================================
 Public Function GetMonth() As Integer
     GetMonth = pMonth
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetDay
-' 説明   : 解析した日を返す
-' 引数   : なし
-' 戻り値 : Integer
 '=================================================
 Public Function GetDay() As Integer
     GetDay = pDay
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetDateValue
-' 説明   : Date型として日付を返す（無効時はNull）
-' 引数   : なし
-' 戻り値 : Variant
 '=================================================
 Public Function GetDateValue() As Variant
     If pIsValid Then
@@ -88,79 +64,64 @@ Public Function GetDateValue() As Variant
     Else
         GetDateValue = Null
     End If
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetFiscalYear
-' 説明   : 会計年度を返す（1～3月は前年）
-' 引数   : なし
-' 戻り値 : Integer
 '=================================================
 Public Function GetFiscalYear() As Integer
     Dim fy As Integer
     fy = pYear
     If pMonth >= 1 And pMonth <= 3 Then fy = fy - 1
     GetFiscalYear = fy
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetPeriod
-' 説明   : BASE_YEARからの経過年数を返す
-' 引数   : なし
-' 戻り値 : Integer
 '=================================================
 Public Function GetPeriod() As Integer
     GetPeriod = GetFiscalYear() - BASE_YEAR
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : GetQuarter
-' 説明   : 月から四半期を返す
-' 引数   : なし
-' 戻り値 : Integer
 '=================================================
 Public Function GetQuarter() As Integer
     Select Case pMonth
-        Case 4 To 6 : GetQuarter = 1
-        Case 7 To 9 : GetQuarter = 2
+        Case 4 To 6: GetQuarter = 1
+        Case 7 To 9: GetQuarter = 2
         Case 10 To 12: GetQuarter = 3
-        Case 1 To 3 : GetQuarter = 4
-        Case Else   : GetQuarter = 0
+        Case 1 To 3: GetQuarter = 4
+        Case Else: GetQuarter = 0
     End Select
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' サブルーチン名 : ParseValue
-' 説明          : rawValueを解析し、年・月・日を設定する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Private Sub ParseValue()
     Dim s As String: s = pRawValue
     pIsValid = False
     If Len(s) = 6 Then
         On Error GoTo ErrLbl
-        pYear  = CInt(Left(s, 4))
+        pYear = CInt(Left(s, 4))
         pMonth = CInt(Right(s, 2))
-        pDay   = 1
+        pDay = 1
         pIsValid = ValidateDate(pYear, pMonth, pDay)
     ElseIf Len(s) = 8 Then
         On Error GoTo ErrLbl
-        pYear  = CInt(Left(s, 4))
+        pYear = CInt(Left(s, 4))
         pMonth = CInt(Mid(s, 5, 2))
-        pDay   = CInt(Right(s, 2))
+        pDay = CInt(Right(s, 2))
         pIsValid = ValidateDate(pYear, pMonth, pDay)
     End If
     Exit Sub
 ErrLbl:
     pIsValid = False
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' 関数名 : ValidateDate
-' 説明   : 年月日から日付の妥当性を検証する
-' 引数   : y（Integer）, m（Integer）, d（Integer）
-' 戻り値 : Boolean
 '=================================================
 Private Function ValidateDate(y As Integer, m As Integer, d As Integer) As Boolean
     On Error GoTo ErrLbl2
@@ -169,15 +130,12 @@ Private Function ValidateDate(y As Integer, m As Integer, d As Integer) As Boole
     Exit Function
 ErrLbl2:
     ValidateDate = False
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' 関数名 : RoundToDigits
-' 説明   : 小数点以下digits桁で四捨五入した値を返す
-' 引数   : val（Variant）, digits（Long）
-' 戻り値 : Double
 '=================================================
 Public Function RoundToDigits(val As Variant, digits As Long) As Double
     Dim factor As Double: factor = 10 ^ digits
     RoundToDigits = Round(CDbl(val) * factor, 0) / factor
-End Function ' ← 関数の終わり
+End Function
