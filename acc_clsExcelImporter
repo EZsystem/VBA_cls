@@ -1,4 +1,4 @@
-'gitにはupしたよ　2025年04月26日(土)　16:42
+'gitにはupしたよ　2025年04月26日(土)　20:46
 '=====================================
 ' Class Module: acc_clsExcelImporter
 ' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス（汎用版）
@@ -18,15 +18,15 @@ Private pDefaultValues    As Object
 Private pImportTableName As String
 Private pImportSourceFieldName As String
 Private pImportTargetFieldName As String
-Public TitleRow As Long             ' タイトル行（例：5）
-Public DataStartRow As Long        ' データ開始行（例：6）
-Public StartColumn As Long         ' データ開始列（例：2 = B列）
-Public ImportColumnMax As Long     ' 最大列数（B?EK = 144列）
+
 
 ' --- 公開プロパティ ---
 Public tableName       As String
 Public TempTableName   As String
-Public ImportColumnMax As Long
+Public TitleRow As Long             ' タイトル行（例：5）
+Public DataStartRow As Long        ' データ開始行（例：6）
+Public StartColumn As Long         ' データ開始列（例：2 = B列）
+Public ImportColumnMax As Long      ' 最大列数（設定しない場合は自動判定）
 
 '=================================================
 ' サブルーチン名 : Init
@@ -113,14 +113,13 @@ End Property
 Private Sub PrepareFieldNames(val As Variant)
     Dim i     As Long
     Dim title As String
+    
     For i = 1 To ImportColumnMax
-        title = ""
-        On Error Resume Next
-        title = Trim(Nz(val(1, i), ""))     ' 1行目タイトル
-        If title = "" Then _
-            title = Trim(Nz(val(i, 1), ""))  ' 1列目対応
-        On Error GoTo 0
-        If title <> "" Then pColMapping.Add i, title
+        title = Trim(Nz(val(1, i), ""))
+        
+        If title <> "" Then
+            pColMapping.Add title, i
+        End If
     Next i
 End Sub
 
@@ -178,8 +177,12 @@ Public Sub ImportFromArray(dataArr As Variant)
     rs.Close
 End Sub
 
+
 '=================================================
 ' 関数名 : ShouldSkip
+' 引数 : dataArr - 読み込んだデータ配列
+'        rowIndex - 対象の行番号
+' 機能 : 取込対象データがスキップ条件に一致するかを判定するにゃ
 '=================================================
 Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
     Dim fn As Variant
@@ -187,19 +190,27 @@ Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
     Dim patterns As Variant
     Dim pat As Variant
 
+    ' スキップ条件未設定ならスキップしない
     If pSkipConditions Is Nothing Then Exit Function
 
     For Each fn In pSkipConditions.Keys
-        If pSkipConditions.Exists(fn) Then
+        ' ★ 置換後タイトルでマッピングが存在するかチェック！
+        If pColMapping.Exists(fn) Then
             Set patterns = pSkipConditions(fn)
 
+            ' ★ 配列の該当セルを安全に取得
             cell = Trim(Nz(dataArr(rowIndex, pColMapping(fn)), ""))
+
+            ' ★ 各パターンと一致するかチェック
             For Each pat In patterns
                 If cell Like pat Then
                     ShouldSkip = True
                     Exit Function
                 End If
             Next pat
+        Else
+            ' ★ もしマッピングに存在しなければデバッグ出力だけ（処理は続行）
+            Debug.Print "【警告】pColMappingに存在しない列名にゃ: " & fn
         End If
     Next fn
 End Function
@@ -211,6 +222,7 @@ Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
 End Sub
 
+
 '=================================================
 ' サブルーチン名 : ImportFromWorksheet
 ' 引数：ws - 取込対象のワークシート（Excel.Worksheet）
@@ -218,10 +230,18 @@ End Sub
 '=================================================
 Public Sub ImportFromWorksheet(ws As Object)
     Dim lastRow As Long
+    Dim lastCol As Long
     Dim titleArr As Variant
     Dim dataArr As Variant
 
     ' --- タイトル読み込み ---
+
+    ' ImportColumnMaxが0なら、タイトル行から列数を自動判定するにゃ！
+    If ImportColumnMax = 0 Then
+        lastCol = ws.Cells(TitleRow, ws.Columns.Count).End(-4159).Column ' xlToLeft
+        ImportColumnMax = lastCol - StartColumn + 1
+    End If
+
     Set pColMapping = CreateObject("Scripting.Dictionary")
     titleArr = ws.Range(ws.Cells(TitleRow, StartColumn), ws.Cells(TitleRow, StartColumn + ImportColumnMax - 1)).value
     fieldNames = titleArr
@@ -236,5 +256,5 @@ Public Sub ImportFromWorksheet(ws As Object)
     ImportFromArray dataArr
 End Sub
 
-' --- 既存の関数群（Init, ImportFromArray, プロパティ定義など）はそのまま続く ---
+
 
