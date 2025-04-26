@@ -2,7 +2,7 @@
 ' Class Module: acc_clsTransactionManager
 ' 説明　：DAOトランザクションの開始・コミット・ロールバックを管理するクラス
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -13,50 +13,38 @@ Private pInTransaction As Boolean
 
 '=================================================
 ' サブルーチン名 : Init
-' 説明          : DAO.Databaseオブジェクトを設定し、トランザクション状態を初期化する
-' 引数          : db（DAO.Database）
-' 戻り値        : なし
 '=================================================
 Public Sub Init(db As DAO.Database)
     Set pDB = db
     pInTransaction = False
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : BeginTransaction
-' 説明          : トランザクションを開始する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub BeginTransaction()
     If Not pInTransaction Then
         pDB.BeginTrans
         pInTransaction = True
     End If
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : Commit
-' 説明          : トランザクションをコミットする
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub Commit()
     If pInTransaction Then
         pDB.CommitTrans
         pInTransaction = False
     End If
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : Rollback
-' 説明          : トランザクションをロールバックする
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub Rollback()
     If pInTransaction Then
         pDB.Rollback
         pInTransaction = False
     End If
-End Sub ' ← サブルーチンの終わり
+End Sub
