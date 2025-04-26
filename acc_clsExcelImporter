@@ -145,3 +145,13 @@ End Function
 Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
 End Sub
+
+'=================================================
+' サブルーチン名 : PrepareMappings_ByTitleMatch_Flexible
+'=================================================
+Private Sub PrepareMappings_ByTitleMatch_Flexible()
+    Dim fld As Variant
+    For Each fld In pColMapping.Items
+        pDictMapping(fld) = fld
+    Next fld
+End Sub
