@@ -2,7 +2,7 @@
 ' Class Module: acc_clsTableTransfer
 ' 説明　：指定テーブル間のデータ削除および挿入による転送機能を提供するクラス
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -13,9 +13,6 @@ Private pSettings  As Collection
 
 '=================================================
 ' サブルーチン名 : Init
-' 説明          : DAO.Databaseオブジェクトを設定し、設定コレクションを初期化する
-' 引数          : db（DAO.Database, Optional）
-' 戻り値        : なし
 '=================================================
 Public Sub Init(Optional db As DAO.Database)
     If db Is Nothing Then
@@ -24,13 +21,10 @@ Public Sub Init(Optional db As DAO.Database)
         Set pDB = db
     End If
     Set pSettings = New Collection
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : AddSetting
-' 説明          : 転送元テーブル、転送先テーブル、キー項目を設定に追加する
-' 引数          : srcTable（String）, tgtTable（String）, keyField（String）
-' 戻り値        : なし
 '=================================================
 Public Sub AddSetting(srcTable As String, tgtTable As String, keyField As String)
     Dim setting As Collection
@@ -39,26 +33,20 @@ Public Sub AddSetting(srcTable As String, tgtTable As String, keyField As String
     setting.Add tgtTable, "Target"
     setting.Add keyField, "Key"
     pSettings.Add setting
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : ExecuteAll
-' 説明          : 設定されたすべての転送設定を実行する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub ExecuteAll()
     Dim setting As Collection
     For Each setting In pSettings
         TransferTable CStr(setting("Source")), CStr(setting("Target")), CStr(setting("Key"))
     Next
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : TransferTable
-' 説明          : 単一のテーブル間でキー項目に一致するレコードを削除し、挿入する
-' 引数          : src（String）, tgt（String）, key（String）
-' 戻り値        : なし
 '=================================================
 Private Sub TransferTable(src As String, tgt As String, key As String)
     Dim sqlDel As String, sqlIns As String
@@ -66,4 +54,4 @@ Private Sub TransferTable(src As String, tgt As String, key As String)
     pDB.Execute sqlDel, dbFailOnError
     sqlIns = "INSERT INTO [" & tgt & "] SELECT * FROM [" & src & "];"
     pDB.Execute sqlIns, dbFailOnError
-End Sub ' ← サブルーチンの終わり
+End Sub
