@@ -1,3 +1,4 @@
+'gitにはupしたよ　2025年04月26日(土)　16:42
 '=====================================
 ' Class Module: acc_clsExcelImporter
 ' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス（汎用版）
@@ -20,7 +21,7 @@ Private pImportTargetFieldName As String
 Public TitleRow As Long             ' タイトル行（例：5）
 Public DataStartRow As Long        ' データ開始行（例：6）
 Public StartColumn As Long         ' データ開始列（例：2 = B列）
-Public ImportColumnMax As Long     ' 最大列数（B〜EK = 144列）
+Public ImportColumnMax As Long     ' 最大列数（B?EK = 144列）
 
 ' --- 公開プロパティ ---
 Public tableName       As String
@@ -31,22 +32,30 @@ Public ImportColumnMax As Long
 ' サブルーチン名 : Init
 '=================================================
 Public Sub Init()
-    Set pDB              = CurrentDb
-    Set pDictMapping     = CreateObject("Scripting.Dictionary")
+    Set pDB = CurrentDb
+    Set pDictMapping = CreateObject("Scripting.Dictionary")
     Set pDictValidFields = CreateObject("Scripting.Dictionary")
-    Set pColMapping      = CreateObject("Scripting.Dictionary")
+    Set pColMapping = CreateObject("Scripting.Dictionary")
+    
+    ' ↓★ここを追記！
+    Set pSkipConditions = CreateObject("Scripting.Dictionary")
+    Set pDefaultValues = CreateObject("Scripting.Dictionary")
 End Sub
+
 
 '=================================================
 ' プロパティ名 : SkipConditions
 '=================================================
-Public Property Let SkipConditions(val As Object)
+Public Property Set SkipConditions(val As Object)
     Set pSkipConditions = val
 End Property
 
 Public Property Get SkipConditions() As Object
     Set SkipConditions = pSkipConditions
 End Property
+
+
+
 
 '=================================================
 ' プロパティ名 : DefaultValues
@@ -132,7 +141,7 @@ Private Sub PrepareMappings_ByImportTable()
     Dim rs As DAO.Recordset
     Set rs = pDB.OpenRecordset(pImportTableName, dbOpenSnapshot)
     Do Until rs.EOF
-        pDictMapping(rs.Fields(pImportSourceFieldName).Value) = rs.Fields(pImportTargetFieldName).Value
+        pDictMapping(rs.Fields(pImportSourceFieldName).value) = rs.Fields(pImportTargetFieldName).value
         rs.MoveNext
     Loop
     rs.Close
@@ -161,7 +170,7 @@ Public Sub ImportFromArray(dataArr As Variant)
                             valCell = pDefaultValues(fld)
                     End If
                 End If
-                rs.Fields(pDictMapping(fld)).Value = valCell
+                rs.Fields(pDictMapping(fld)).value = valCell
             Next c
             rs.Update
         End If
@@ -173,20 +182,25 @@ End Sub
 ' 関数名 : ShouldSkip
 '=================================================
 Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
-    Dim fn       As Variant
+    Dim fn As Variant
+    Dim cell As String
     Dim patterns As Variant
-    Dim cell     As String
+    Dim pat As Variant
+
     If pSkipConditions Is Nothing Then Exit Function
+
     For Each fn In pSkipConditions.Keys
-        patterns = pSkipConditions(fn)
-        cell = Trim(Nz(dataArr(rowIndex, pColMapping(fn)), ""))
-        Dim pat As Variant
-        For Each pat In patterns
-            If cell Like pat Then
-                ShouldSkip = True
-                Exit Function
-            End If
-        Next pat
+        If pSkipConditions.Exists(fn) Then
+            Set patterns = pSkipConditions(fn)
+
+            cell = Trim(Nz(dataArr(rowIndex, pColMapping(fn)), ""))
+            For Each pat In patterns
+                If cell Like pat Then
+                    ShouldSkip = True
+                    Exit Function
+                End If
+            Next pat
+        End If
     Next fn
 End Function
 
@@ -209,17 +223,18 @@ Public Sub ImportFromWorksheet(ws As Object)
 
     ' --- タイトル読み込み ---
     Set pColMapping = CreateObject("Scripting.Dictionary")
-    titleArr = ws.Range(ws.Cells(TitleRow, StartColumn), ws.Cells(TitleRow, StartColumn + ImportColumnMax - 1)).Value
+    titleArr = ws.Range(ws.Cells(TitleRow, StartColumn), ws.Cells(TitleRow, StartColumn + ImportColumnMax - 1)).value
     fieldNames = titleArr
 
     ' --- データ最終行取得 ---
-    lastRow = ws.Cells(ws.Rows.Count, StartColumn).End(-4162).Row
+    lastRow = ws.Cells(ws.Rows.Count, StartColumn).End(-4162).row
 
     ' --- データ読み込み ---
-    dataArr = ws.Range(ws.Cells(DataStartRow, StartColumn), ws.Cells(lastRow, StartColumn + ImportColumnMax - 1)).Value
+    dataArr = ws.Range(ws.Cells(DataStartRow, StartColumn), ws.Cells(lastRow, StartColumn + ImportColumnMax - 1)).value
 
     ' --- 配列から取込実行 ---
     ImportFromArray dataArr
 End Sub
 
 ' --- 既存の関数群（Init, ImportFromArray, プロパティ定義など）はそのまま続く ---
+
