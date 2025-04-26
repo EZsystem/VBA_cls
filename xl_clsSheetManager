@@ -1,9 +1,17 @@
 '=====================================
 ' Class Module: xl_clsSheetManager
+' 説明　：シートの存在確認、取得、保護解除・保護を提供するユーティリティ
+' 作成日：2025/04/25
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Explicit
 
-' 指定ワークブック内にシートが存在するかチェック
+' --- 内部保持変数 ---
+'（このクラスでは内部変数はありません）
+
+'=================================================
+' 関数名 : SheetExists
+'=================================================
 Public Function SheetExists(wb As Workbook, sheetName As String) As Boolean
     On Error Resume Next
     Dim ws As Worksheet
@@ -12,7 +20,9 @@ Public Function SheetExists(wb As Workbook, sheetName As String) As Boolean
     On Error GoTo 0
 End Function
 
-' シートを取得（存在しなければエラーを発生）
+'=================================================
+' 関数名 : GetSheet
+'=================================================
 Public Function GetSheet(wb As Workbook, sheetName As String) As Worksheet
     If SheetExists(wb, sheetName) Then
         Set GetSheet = wb.Worksheets(sheetName)
@@ -21,12 +31,16 @@ Public Function GetSheet(wb As Workbook, sheetName As String) As Worksheet
     End If
 End Function
 
-' シート保護を解除（パスワード省略可）
+'=================================================
+' サブルーチン名 : UnprotectSheet
+'=================================================
 Public Sub UnprotectSheet(ws As Worksheet, Optional password As String = "")
     If ws.ProtectContents Then ws.Unprotect password
 End Sub
 
-' シート保護（パスワード・オプション指定可）
+'=================================================
+' サブルーチン名 : ProtectSheet
+'=================================================
 Public Sub ProtectSheet(ws As Worksheet, Optional password As String = "", Optional DrawingObjects As Boolean = True, Optional Contents As Boolean = True, Optional Scenarios As Boolean = True)
     ws.Protect password:=password, DrawingObjects:=DrawingObjects, Contents:=Contents, Scenarios:=Scenarios
 End Sub
