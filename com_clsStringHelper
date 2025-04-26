@@ -1,6 +1,6 @@
 '=====================================
-' Class Module: com_clsDateMath
-' 説明　：日付文字列の解析や期間計算を行うユーティリティ
+' Class Module: com_clsStringHelper
+' 説明　：文字列分割・結合、大小文字変換、検索・置換を提供するユーティリティ
 ' 作成日：2025/04/25
 ' 更新日：再生成 by そうじろう
 '=====================================
@@ -8,134 +8,46 @@ Option Compare Database
 Option Explicit
 
 ' --- 内部保持変数 ---
-Private pRawValue As String
-Private pYear     As Integer
-Private pMonth    As Integer
-Private pDay      As Integer
-Private pIsValid  As Boolean
-Private Const BASE_YEAR As Integer = 2012
+'（このクラスでは内部変数はありません）
 
 '=================================================
-' プロパティ名 : rawValue
+' 関数名 : SplitToArray
 '=================================================
-Public Property Let rawValue(v As String)
-    pRawValue = Trim(v)
-    ParseValue
-End Property
-
-Public Property Get rawValue() As String
-    rawValue = pRawValue
-End Property
-
-'=================================================
-' プロパティ名 : IsValid
-'=================================================
-Public Property Get IsValid() As Boolean
-    IsValid = pIsValid
-End Property
-
-'=================================================
-' 関数名 : GetYear
-'=================================================
-Public Function GetYear() As Integer
-    GetYear = pYear
+Public Function SplitToArray(s As String, delimiter As String) As Variant
+    SplitToArray = Split(s, delimiter)
 End Function
 
 '=================================================
-' 関数名 : GetMonth
+' 関数名 : JoinArray
 '=================================================
-Public Function GetMonth() As Integer
-    GetMonth = pMonth
+Public Function JoinArray(arr As Variant, delimiter As String) As String
+    JoinArray = Join(arr, delimiter)
 End Function
 
 '=================================================
-' 関数名 : GetDay
+' 関数名 : ToUpper
 '=================================================
-Public Function GetDay() As Integer
-    GetDay = pDay
+Public Function ToUpper(s As String) As String
+    ToUpper = UCase(s)
 End Function
 
 '=================================================
-' 関数名 : GetDateValue
+' 関数名 : ToLower
 '=================================================
-Public Function GetDateValue() As Variant
-    If pIsValid Then
-        GetDateValue = DateSerial(pYear, pMonth, pDay)
-    Else
-        GetDateValue = Null
-    End If
+Public Function ToLower(s As String) As String
+    ToLower = LCase(s)
 End Function
 
 '=================================================
-' 関数名 : GetFiscalYear
+' 関数名 : ContainsText
 '=================================================
-Public Function GetFiscalYear() As Integer
-    Dim fy As Integer
-    fy = pYear
-    If pMonth >= 1 And pMonth <= 3 Then fy = fy - 1
-    GetFiscalYear = fy
+Public Function ContainsText(s As String, keyword As String) As Boolean
+    ContainsText = (InStr(1, s, keyword, vbTextCompare) > 0)
 End Function
 
 '=================================================
-' 関数名 : GetPeriod
+' 関数名 : ReplaceAll
 '=================================================
-Public Function GetPeriod() As Integer
-    GetPeriod = GetFiscalYear() - BASE_YEAR
-End Function
-
-'=================================================
-' 関数名 : GetQuarter
-'=================================================
-Public Function GetQuarter() As Integer
-    Select Case pMonth
-        Case 4 To 6: GetQuarter = 1
-        Case 7 To 9: GetQuarter = 2
-        Case 10 To 12: GetQuarter = 3
-        Case 1 To 3: GetQuarter = 4
-        Case Else: GetQuarter = 0
-    End Select
-End Function
-
-'=================================================
-' サブルーチン名 : ParseValue
-'=================================================
-Private Sub ParseValue()
-    Dim s As String: s = pRawValue
-    pIsValid = False
-    If Len(s) = 6 Then
-        On Error GoTo ErrLbl
-        pYear = CInt(Left(s, 4))
-        pMonth = CInt(Right(s, 2))
-        pDay = 1
-        pIsValid = ValidateDate(pYear, pMonth, pDay)
-    ElseIf Len(s) = 8 Then
-        On Error GoTo ErrLbl
-        pYear = CInt(Left(s, 4))
-        pMonth = CInt(Mid(s, 5, 2))
-        pDay = CInt(Right(s, 2))
-        pIsValid = ValidateDate(pYear, pMonth, pDay)
-    End If
-    Exit Sub
-ErrLbl:
-    pIsValid = False
-End Sub
-
-'=================================================
-' 関数名 : ValidateDate
-'=================================================
-Private Function ValidateDate(y As Integer, m As Integer, d As Integer) As Boolean
-    On Error GoTo ErrLbl2
-    Dim dt As Date: dt = DateSerial(y, m, d)
-    ValidateDate = True
-    Exit Function
-ErrLbl2:
-    ValidateDate = False
-End Function
-
-'=================================================
-' 関数名 : RoundToDigits
-'=================================================
-Public Function RoundToDigits(val As Variant, digits As Long) As Double
-    Dim factor As Double: factor = 10 ^ digits
-    RoundToDigits = Round(CDbl(val) * factor, 0) / factor
+Public Function ReplaceAll(s As String, find As String, repl As String) As String
+    ReplaceAll = Replace(s, find, repl)
 End Function
