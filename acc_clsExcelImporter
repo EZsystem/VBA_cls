@@ -1,6 +1,6 @@
 '=====================================
 ' Class Module: acc_clsExcelImporter
-' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス
+' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス（汎用版）
 ' 作成日：2025/04/25
 ' 更新日：再生成 by そうじろう
 '=====================================
@@ -14,6 +14,9 @@ Private pDictValidFields  As Object
 Private pColMapping       As Object
 Private pSkipConditions   As Object
 Private pDefaultValues    As Object
+Private pImportTableName As String
+Private pImportSourceFieldName As String
+Private pImportTargetFieldName As String
 
 ' --- 公開プロパティ ---
 Public tableName       As String
@@ -71,6 +74,27 @@ Public Property Let fieldNames(val As Variant)
 End Property
 
 '=================================================
+' プロパティ名 : ImportTableName
+'=================================================
+Public Property Let ImportTableName(val As String)
+    pImportTableName = val
+End Property
+
+'=================================================
+' プロパティ名 : ImportSourceFieldName
+'=================================================
+Public Property Let ImportSourceFieldName(val As String)
+    pImportSourceFieldName = val
+End Property
+
+'=================================================
+' プロパティ名 : ImportTargetFieldName
+'=================================================
+Public Property Let ImportTargetFieldName(val As String)
+    pImportTargetFieldName = val
+End Property
+
+'=================================================
 ' サブルーチン名 : PrepareFieldNames
 '=================================================
 Private Sub PrepareFieldNames(val As Variant)
@@ -85,6 +109,29 @@ Private Sub PrepareFieldNames(val As Variant)
         On Error GoTo 0
         If title <> "" Then pColMapping.Add i, title
     Next i
+End Sub
+
+'=================================================
+' サブルーチン名 : PrepareMappings_ByTitleMatch_Flexible
+'=================================================
+Private Sub PrepareMappings_ByTitleMatch_Flexible()
+    Dim fld As Variant
+    For Each fld In pColMapping.Items
+        pDictMapping(fld) = fld
+    Next fld
+End Sub
+
+'=================================================
+' サブルーチン名 : PrepareMappings_ByImportTable
+'=================================================
+Private Sub PrepareMappings_ByImportTable()
+    Dim rs As DAO.Recordset
+    Set rs = pDB.OpenRecordset(pImportTableName, dbOpenSnapshot)
+    Do Until rs.EOF
+        pDictMapping(rs.Fields(pImportSourceFieldName).Value) = rs.Fields(pImportTargetFieldName).Value
+        rs.MoveNext
+    Loop
+    rs.Close
 End Sub
 
 '=================================================
@@ -110,7 +157,7 @@ Public Sub ImportFromArray(dataArr As Variant)
                             valCell = pDefaultValues(fld)
                     End If
                 End If
-                rs.Fields(fld).Value = valCell
+                rs.Fields(pDictMapping(fld)).Value = valCell
             Next c
             rs.Update
         End If
@@ -144,14 +191,4 @@ End Function
 '=================================================
 Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
-End Sub
-
-'=================================================
-' サブルーチン名 : PrepareMappings_ByTitleMatch_Flexible
-'=================================================
-Private Sub PrepareMappings_ByTitleMatch_Flexible()
-    Dim fld As Variant
-    For Each fld In pColMapping.Items
-        pDictMapping(fld) = fld
-    Next fld
 End Sub
