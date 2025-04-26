@@ -2,7 +2,7 @@
 ' Class Module: acc_clsTableUpdater
 ' 説明　：テーブルのレコードセットを操作しフィールド更新を行うクラス
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -13,30 +13,21 @@ Private pTable As String
 
 '=================================================
 ' サブルーチン名 : Init
-' 説明          : DAO.Databaseオブジェクトと対象テーブル名を設定する
-' 引数          : tableName（String）
-' 戻り値        : なし
 '=================================================
 Public Sub Init(tableName As String)
     Set pDB = CurrentDb
     pTable = tableName
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' 関数名 : OpenRS
-' 説明   : 対象テーブルのRecordsetを返す
-' 引数   : なし
-' 戻り値 : DAO.Recordset
 '=================================================
 Private Function OpenRS() As DAO.Recordset
     Set OpenRS = pDB.OpenRecordset(pTable, dbOpenDynaset)
-End Function ' ← 関数の終わり
+End Function
 
 '=================================================
 ' サブルーチン名 : UpdateFieldFromField
-' 説明          : 同じレコード内で指定ソースフィールドの値を指定ターゲットフィールドにコピーする
-' 引数          : src（String）, tgt（String）
-' 戻り値        : なし
 '=================================================
 Public Sub UpdateFieldFromField(src As String, tgt As String)
     Dim rs As DAO.Recordset
@@ -48,13 +39,10 @@ Public Sub UpdateFieldFromField(src As String, tgt As String)
         rs.MoveNext
     Loop
     rs.Close
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : UpdateFieldFromDiff
-' 説明          : 2つのフィールドの差を計算し指定ターゲットフィールドに設定する
-' 引数          : a（String）, b（String）, tgt（String）
-' 戻り値        : なし
 '=================================================
 Public Sub UpdateFieldFromDiff(a As String, b As String, tgt As String)
     Dim rs As DAO.Recordset
@@ -66,13 +54,10 @@ Public Sub UpdateFieldFromDiff(a As String, b As String, tgt As String)
         rs.MoveNext
     Loop
     rs.Close
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : UpdateFieldByConcat
-' 説明          : 2つのフィールドを文字列結合し指定ターゲットフィールドに設定する
-' 引数          : a（String）, b（String）, tgt（String）
-' 戻り値        : なし
 '=================================================
 Public Sub UpdateFieldByConcat(a As String, b As String, tgt As String)
     Dim rs As DAO.Recordset
@@ -84,13 +69,10 @@ Public Sub UpdateFieldByConcat(a As String, b As String, tgt As String)
         rs.MoveNext
     Loop
     rs.Close
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : UpdateFieldWithCondition
-' 説明          : 条件に応じて直接値または関数実行結果を指定ターゲットフィールドに設定する
-' 引数          : condField（String）, condVal（String）, tgt（String）, valField（String）, altFunc（String）
-' 戻り値        : なし
 '=================================================
 Public Sub UpdateFieldWithCondition(condField As String, condVal As String, tgt As String, valField As String, altFunc As String)
     Dim rs As DAO.Recordset
@@ -108,4 +90,4 @@ Public Sub UpdateFieldWithCondition(condField As String, condVal As String, tgt 
         rs.MoveNext
     Loop
     rs.Close
-End Sub ' ← サブルーチンの終わり
+End Sub
