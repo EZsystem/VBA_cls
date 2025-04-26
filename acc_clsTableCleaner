@@ -2,7 +2,7 @@
 ' Class Module: acc_clsTableCleaner
 ' 説明　：指定テーブルの全レコード削除機能を提供するクラス
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -13,34 +13,25 @@ Private pTables As Collection
 
 '=================================================
 ' サブルーチン名 : Init
-' 説明          : DAO.Databaseオブジェクトを設定し、テーブルコレクションを初期化する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub Init()
     Set pDB = CurrentDb
     Set pTables = New Collection
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : AddTable
-' 説明          : クリア対象テーブル名をコレクションに追加する
-' 引数          : tableName（String）
-' 戻り値        : なし
 '=================================================
 Public Sub AddTable(tableName As String)
     pTables.Add tableName
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : ClearAll
-' 説明          : コレクションに登録されたすべてのテーブルのレコードを削除する
-' 引数          : なし
-' 戻り値        : なし
 '=================================================
 Public Sub ClearAll()
     Dim t As Variant
     For Each t In pTables
         pDB.Execute "DELETE FROM [" & t & "];", dbFailOnError
     Next
-End Sub ' ← サブルーチンの終わり
+End Sub
