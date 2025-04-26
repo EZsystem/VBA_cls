@@ -2,7 +2,7 @@
 ' Class Module: com_clsErrorUtility
 ' 説明　：エラーの収集・表示および既定値取得を提供するユーティリティ
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
@@ -13,33 +13,24 @@ Private pDebugMode As Boolean
 
 '=================================================
 ' サブルーチン名 : Initialize
-' 説明          : エラーコレクション生成とデバッグモード設定を行う
-' 引数          : debugMode（Boolean, Optional）
-' 戻り値        : なし
 '=================================================
 Public Sub Initialize(Optional debugMode As Boolean = True)
     Set pErrors = New Collection
     pDebugMode = debugMode
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : LogError
-' 説明          : エラーログにタイトルと詳細を追加する
-' 引数          : title（String）, details（String）
-' 戻り値        : なし
 '=================================================
 Public Sub LogError(title As String, details As String)
     Dim msg As String
     msg = "■■■ " & title & " (" & Now & ") ■■■" & vbCrLf & details
     If pDebugMode Then Debug.Print msg
     pErrors.Add msg
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' サブルーチン名 : ShowAllErrors
-' 説明          : 収集したエラーをメッセージまたはデバッグに表示する
-' 引数          : showInMsgBox（Boolean, Optional）
-' 戻り値        : なし
 '=================================================
 Public Sub ShowAllErrors(Optional showInMsgBox As Boolean = True)
     Dim errMsg As String
@@ -56,23 +47,17 @@ Public Sub ShowAllErrors(Optional showInMsgBox As Boolean = True)
     Else
         Debug.Print errMsg
     End If
-End Sub ' ← サブルーチンの終わり
+End Sub
 
 '=================================================
 ' プロパティ名 : ErrorCount
-' 説明          : 現在のエラー件数を返す
-' 引数          : なし
-' 戻り値        : Long
 '=================================================
 Public Property Get ErrorCount() As Long
     ErrorCount = pErrors.Count
-End Property ' ← プロパティの終わり
+End Property
 
 '=================================================
 ' 関数名 : GetDefaultValue
-' 説明   : フィールド型に応じた既定値を返す
-' 引数   : fieldType（Integer）, value（Variant）
-' 戻り値 : Variant
 '=================================================
 Public Function GetDefaultValue(fieldType As Integer, value As Variant) As Variant
     On Error Resume Next
@@ -119,4 +104,4 @@ Public Function GetDefaultValue(fieldType As Integer, value As Variant) As Varia
             GetDefaultValue = Null
     End Select
     On Error GoTo 0
-End Function ' ← 関数の終わり
+End Function
