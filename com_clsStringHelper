@@ -2,7 +2,7 @@
 ' Class Module: com_clsStringHelper
 ' 説明　：文字列分割・結合、大小文字変換、検索・置換を提供するユーティリティ
 ' 作成日：2025/04/25
-' 更新日：-
+' 更新日：再生成 by そうじろう
 '=====================================
 Option Compare Database
 Option Explicit
