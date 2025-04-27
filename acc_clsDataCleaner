@@ -44,16 +44,72 @@ Public Function CleanDate(val As Variant, Optional defaultDate As Date = #1900/1
 End Function
 
 '=====================================
-' 関数名 : TextToNumber
-' 説明　 : テキスト型を数値型に安全変換するにゃ
+' 関数名 : TextToInteger
+' 説明　 : テキスト型をInteger型に安全変換するにゃ
 '=====================================
-Public Function TextToNumber(val As Variant, Optional defaultValue As Double = 0) As Double
+Public Function TextToInteger(val As Variant, Optional defaultValue As Integer = 0) As Integer
     If IsNull(val) Or Trim(val) = "" Then
-        TextToNumber = defaultValue
+        TextToInteger = defaultValue
     ElseIf IsNumeric(val) Then
-        TextToNumber = CDbl(val)
+        TextToInteger = CInt(val)
     Else
-        TextToNumber = defaultValue
+        TextToInteger = defaultValue
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToLong
+' 説明　 : テキスト型をLong型に安全変換するにゃ
+'=====================================
+Public Function TextToLong(val As Variant, Optional defaultValue As Long = 0) As Long
+    If IsNull(val) Or Trim(val) = "" Then
+        TextToLong = defaultValue
+    ElseIf IsNumeric(val) Then
+        TextToLong = CLng(val)
+    Else
+        TextToLong = defaultValue
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToSingle
+' 説明　 : テキスト型をSingle型に安全変換するにゃ
+'=====================================
+Public Function TextToSingle(val As Variant, Optional defaultValue As Single = 0) As Single
+    If IsNull(val) Or Trim(val) = "" Then
+        TextToSingle = defaultValue
+    ElseIf IsNumeric(val) Then
+        TextToSingle = CSng(val)
+    Else
+        TextToSingle = defaultValue
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToDouble
+' 説明　 : テキスト型をDouble型に安全変換するにゃ
+'=====================================
+Public Function TextToDouble(val As Variant, Optional defaultValue As Double = 0) As Double
+    If IsNull(val) Or Trim(val) = "" Then
+        TextToDouble = defaultValue
+    ElseIf IsNumeric(val) Then
+        TextToDouble = CDbl(val)
+    Else
+        TextToDouble = defaultValue
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToCurrency
+' 説明　 : テキスト型をCurrency型に安全変換するにゃ
+'=====================================
+Public Function TextToCurrency(val As Variant, Optional defaultValue As Currency = 0) As Currency
+    If IsNull(val) Or Trim(val) = "" Then
+        TextToCurrency = defaultValue
+    ElseIf IsNumeric(val) Then
+        TextToCurrency = CCur(val)
+    Else
+        TextToCurrency = defaultValue
     End If
 End Function
 
