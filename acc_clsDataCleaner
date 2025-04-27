@@ -1,0 +1,115 @@
+'=====================================
+' Class Module: acc_clsDataCleaner
+' 説明　：データ型変換とクレンジングを一括で提供する汎用クラスにゃ！
+' 作成日：2025/04/26
+' 作成者：そうじろう
+'=====================================
+Option Compare Database
+Option Explicit
+
+'=====================================
+' 関数名 : CleanText
+' 説明　 : NULL補完＋Trimして安全な文字列を返すにゃ
+'=====================================
+Public Function CleanText(val As Variant) As String
+    If IsNull(val) Then
+        CleanText = ""
+    Else
+        CleanText = Trim(CStr(val))
+    End If
+End Function
+
+'=====================================
+' 関数名 : CleanNumber
+' 説明　 : NULL補完＋数値型に安全変換するにゃ
+'=====================================
+Public Function CleanNumber(val As Variant, Optional defaultValue As Double = 0) As Double
+    If IsNull(val) Or Not IsNumeric(val) Then
+        CleanNumber = defaultValue
+    Else
+        CleanNumber = CDbl(val)
+    End If
+End Function
+
+'=====================================
+' 関数名 : CleanDate
+' 説明　 : NULL補完＋日付型に安全変換するにゃ
+'=====================================
+Public Function CleanDate(val As Variant, Optional defaultDate As Date = #1900/1/1#) As Date
+    If IsNull(val) Or Not IsDate(val) Then
+        CleanDate = defaultDate
+    Else
+        CleanDate = CDate(val)
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToNumber
+' 説明　 : テキスト型を数値型に安全変換するにゃ
+'=====================================
+Public Function TextToNumber(val As Variant, Optional defaultValue As Double = 0) As Double
+    If IsNull(val) Or Trim(val) = "" Then
+        TextToNumber = defaultValue
+    ElseIf IsNumeric(val) Then
+        TextToNumber = CDbl(val)
+    Else
+        TextToNumber = defaultValue
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToDate
+' 説明　 : テキスト型を日付型に安全変換するにゃ
+'=====================================
+Public Function TextToDate(val As Variant, Optional defaultDate As Date = #1900/1/1#) As Date
+    If IsNull(val) Or Trim(val) = "" Then
+        TextToDate = defaultDate
+    ElseIf IsDate(val) Then
+        TextToDate = CDate(val)
+    Else
+        TextToDate = defaultDate
+    End If
+End Function
+
+'=====================================
+' 関数名 : TextToBoolean
+' 説明　 : テキスト型をブール型に変換するにゃ
+'=====================================
+Public Function TextToBoolean(val As Variant, Optional defaultValue As Boolean = False) As Boolean
+    Dim txt As String
+    If IsNull(val) Then
+        TextToBoolean = defaultValue
+        Exit Function
+    End If
+    txt = LCase(Trim(CStr(val)))
+    Select Case txt
+        Case "true", "yes", "1"
+            TextToBoolean = True
+        Case "false", "no", "0"
+            TextToBoolean = False
+        Case Else
+            TextToBoolean = defaultValue
+    End Select
+End Function
+
+'=====================================
+' 関数名 : IsNumericStrict
+' 説明　 : 厳密な数値判定をするにゃ
+'=====================================
+Public Function IsNumericStrict(val As Variant) As Boolean
+    IsNumericStrict = False
+    If Not IsNull(val) Then
+        If IsNumeric(val) Then IsNumericStrict = True
+    End If
+End Function
+
+'=====================================
+' 関数名 : IsDateStrict
+' 説明　 : 厳密な日付判定をするにゃ
+'=====================================
+Public Function IsDateStrict(val As Variant) As Boolean
+    IsDateStrict = False
+    If Not IsNull(val) Then
+        If IsDate(val) Then IsDateStrict = True
+    End If
+End Function
