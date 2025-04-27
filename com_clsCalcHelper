@@ -1,0 +1,72 @@
+'=====================================
+' Class Module: com_clsCalcHelper
+' 説明　：四則演算＋数値補正機能を提供する共通ヘルパークラスにゃ！
+' 作成日：2025/04/26
+' 作成者：そうじろう
+'=====================================
+Option Compare Database
+Option Explicit
+
+'=====================================
+' 関数名 : SafeAdd
+' 説明　 : NULL安全な加算にゃ
+'=====================================
+Public Function SafeAdd(a As Variant, b As Variant) As Double
+    SafeAdd = Nz(a, 0) + Nz(b, 0)
+End Function
+
+'=====================================
+' 関数名 : SafeSubtract
+' 説明　 : NULL安全な減算にゃ
+'=====================================
+Public Function SafeSubtract(a As Variant, b As Variant) As Double
+    SafeSubtract = Nz(a, 0) - Nz(b, 0)
+End Function
+
+'=====================================
+' 関数名 : SafeMultiply
+' 説明　 : NULL安全な乗算にゃ
+'=====================================
+Public Function SafeMultiply(a As Variant, b As Variant) As Double
+    SafeMultiply = Nz(a, 0) * Nz(b, 0)
+End Function
+
+'=====================================
+' 関数名 : SafeDivide
+' 説明　 : NULL安全な除算、0除算回避にゃ
+'=====================================
+Public Function SafeDivide(a As Variant, b As Variant, Optional defaultValue As Double = 0) As Double
+    If Nz(b, 0) = 0 Then
+        SafeDivide = defaultValue
+    Else
+        SafeDivide = Nz(a, 0) / Nz(b, 0)
+    End If
+End Function
+
+'=====================================
+' 関数名 : RoundToNDecimals
+' 説明　 : 任意小数点位で四捨五入するにゃ
+'=====================================
+Public Function RoundToNDecimals(val As Variant, decimals As Integer) As Double
+    RoundToNDecimals = Round(Nz(val, 0), decimals)
+End Function
+
+'=====================================
+' 関数名 : FloorToNDecimals
+' 説明　 : 任意小数点位で切り捨てするにゃ
+'=====================================
+Public Function FloorToNDecimals(val As Variant, decimals As Integer) As Double
+    Dim factor As Double
+    factor = 10 ^ decimals
+    FloorToNDecimals = Int(Nz(val, 0) * factor) / factor
+End Function
+
+'=====================================
+' 関数名 : CeilToNDecimals
+' 説明　 : 任意小数点位で切り上げするにゃ
+'=====================================
+Public Function CeilToNDecimals(val As Variant, decimals As Integer) As Double
+    Dim factor As Double
+    factor = 10 ^ decimals
+    CeilToNDecimals = -Int(-Nz(val, 0) * factor) / factor
+End Function
