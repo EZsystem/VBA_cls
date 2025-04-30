@@ -12,6 +12,7 @@ Private pDB As DAO.Database
 
 '=================================================
 ' サブルーチン名 : Init
+' 機能 : DAO.Database オブジェクト（CurrentDb）を初期化して保持するにゃ
 '=================================================
 Public Sub Init()
     Set pDB = CurrentDb
@@ -19,6 +20,7 @@ End Sub
 
 '=================================================
 ' プロパティ名 : DB
+' 機能 : 内部に保持した DAO.Database オブジェクトを取得するにゃ
 '=================================================
 Public Property Get DB() As DAO.Database
     Set DB = pDB
@@ -26,6 +28,9 @@ End Property
 
 '=================================================
 ' サブルーチン名 : ExecuteSQL
+' 引数 : sql - 実行するSQL文
+'        failOnError - Trueならエラー時に例外を出す（既定値：True）
+' 機能 : SQL文を現在のDB接続で実行するにゃ。エラーハンドリングも対応にゃ
 '=================================================
 Public Sub ExecuteSQL(sql As String, Optional failOnError As Boolean = True)
     pDB.Execute sql, IIf(failOnError, dbFailOnError, dbSeeChanges)
