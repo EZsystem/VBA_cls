@@ -11,14 +11,19 @@ Option Explicit
 Private arrData As Variant
 
 '=================================================
-' プロパティ名 : Data
+' プロパティ名 : Let data
+' 引数 : value - 2次元配列データ
+' 機能 : 処理対象となる2次元配列データ（タイトル＋データ）を保持するにゃ
 '=================================================
-Public Property Let Data(value As Variant)
+Public Property Let data(value As Variant)
     arrData = value
 End Property
 
 '=================================================
 ' 関数名 : GetColIndex
+' 引数 : colName - 探索する列名
+' 戻り値 : 対応する列番号（見つからないときは -1）
+' 機能 : 配列の1行目（タイトル行）から、列名に対応する列番号を取得するにゃ
 '=================================================
 Public Function GetColIndex(colName As String) As Long
     Dim j As Long
@@ -33,6 +38,12 @@ End Function
 
 '=================================================
 ' 関数名 : CalculateOneRow
+' 引数 : row - 対象行番号
+'        col1, col2 - 計算対象の列名
+'        op - 演算子（add, sub, mul, div）
+'        doRound, digits - 丸め設定（オプション）
+' 戻り値 : 計算結果（Double）
+' 機能 : 指定行の2列間で指定された演算を実行し、必要に応じて丸めて返すにゃ
 '=================================================
 Public Function CalculateOneRow(row As Long, col1 As String, col2 As String, op As String, Optional doRound As Boolean = False, Optional digits As Integer = 0) As Double
     Dim i1 As Long, i2 As Long
@@ -55,6 +66,14 @@ End Function
 
 '=================================================
 ' 関数名 : CalculateIfMatch
+' 引数 : row - 行番号
+'        condCol - 条件列名
+'        expVal - 条件一致値
+'        col1, col2 - 計算対象列名
+'        op - 演算子
+'        doRound, digits - 丸め設定（オプション）
+' 戻り値 : 計算結果（条件一致時のみ）
+' 機能 : 指定列の値が条件値と一致する行に対してのみ、計算を実行して返すにゃ
 '=================================================
 Public Function CalculateIfMatch(row As Long, condCol As String, expVal As Variant, col1 As String, col2 As String, op As String, Optional doRound As Boolean = False, Optional digits As Integer = 0) As Double
     Dim idx As Long: idx = GetColIndex(condCol)
@@ -67,6 +86,8 @@ End Function
 
 '=================================================
 ' 関数名 : IsValueEqual
+' 引数 : row, colName, expected
+' 機能 : 指定行・列の値が expected と等しいかを判定するにゃ
 '=================================================
 Public Function IsValueEqual(row As Long, colName As String, expected As Variant) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -76,6 +97,8 @@ End Function
 
 '=================================================
 ' 関数名 : IsBlank
+' 引数 : row, colName
+' 機能 : 指定セルが空欄かどうかを判定するにゃ（空文字または NULL）
 '=================================================
 Public Function IsBlank(row As Long, colName As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -85,6 +108,8 @@ End Function
 
 '=================================================
 ' 関数名 : IsGreaterThan
+' 引数 : row, colName, threshold
+' 機能 : 指定セルの数値が閾値より大きいかを判定するにゃ
 '=================================================
 Public Function IsGreaterThan(row As Long, colName As String, threshold As Double) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -94,6 +119,8 @@ End Function
 
 '=================================================
 ' 関数名 : IsBetween
+' 引数 : row, colName, minVal, maxVal
+' 機能 : 指定セルの値が範囲内（minVal?maxVal）にあるかを判定するにゃ
 '=================================================
 Public Function IsBetween(row As Long, colName As String, minVal As Double, maxVal As Double) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -103,6 +130,8 @@ End Function
 
 '=================================================
 ' 関数名 : Contains
+' 引数 : row, colName, keyword
+' 機能 : セル内に指定キーワードが含まれているかを判定するにゃ（部分一致）
 '=================================================
 Public Function Contains(row As Long, colName As String, keyword As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -112,6 +141,8 @@ End Function
 
 '=================================================
 ' 関数名 : StartsWith
+' 引数 : row, colName, prefix
+' 機能 : セル値が指定の prefix で始まっているかを判定するにゃ
 '=================================================
 Public Function StartsWith(row As Long, colName As String, prefix As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -121,6 +152,8 @@ End Function
 
 '=================================================
 ' 関数名 : EndsWith
+' 引数 : row, colName, suffix
+' 機能 : セル値が指定の suffix で終わっているかを判定するにゃ
 '=================================================
 Public Function EndsWith(row As Long, colName As String, suffix As String) As Boolean
     Dim idx As Long: idx = GetColIndex(colName)
@@ -130,6 +163,8 @@ End Function
 
 '=================================================
 ' 関数名 : GetValue
+' 引数 : row, colName
+' 機能 : 指定セルの値を返すにゃ（Variant）
 '=================================================
 Public Function GetValue(row As Long, colName As String) As Variant
     Dim idx As Long: idx = GetColIndex(colName)
@@ -139,6 +174,8 @@ End Function
 
 '=================================================
 ' 関数名 : GetNumericValue
+' 引数 : row, colName
+' 機能 : 指定セルの数値値を返すにゃ（非数値や空欄は 0 にする）
 '=================================================
 Public Function GetNumericValue(row As Long, colName As String) As Double
     Dim v As Variant: v = GetValue(row, colName)
