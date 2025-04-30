@@ -1,4 +1,3 @@
-'gitにはupしたよ　2025年04月26日(土)　20:46
 '=====================================
 ' Class Module: acc_clsExcelImporter
 ' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス（汎用版）
@@ -30,6 +29,9 @@ Public ImportColumnMax As Long      ' 最大列数（設定しない場合は自
 
 '=================================================
 ' サブルーチン名 : Init
+' 機能 : データベース接続（CurrentDb）および各種辞書オブジェクトを初期化するにゃ
+'        項目マッピング、有効フィールド、列マッピング、
+'        スキップ条件、初期値設定の各辞書を作成するにゃ
 '=================================================
 Public Sub Init()
     Set pDB = CurrentDb
@@ -37,7 +39,6 @@ Public Sub Init()
     Set pDictValidFields = CreateObject("Scripting.Dictionary")
     Set pColMapping = CreateObject("Scripting.Dictionary")
     
-    ' ↓★ここを追記！
     Set pSkipConditions = CreateObject("Scripting.Dictionary")
     Set pDefaultValues = CreateObject("Scripting.Dictionary")
 End Sub
@@ -45,6 +46,8 @@ End Sub
 
 '=================================================
 ' プロパティ名 : SkipConditions
+' 引数 : val - スキップ条件の辞書（Dictionary）
+' 機能 : スキップ条件の辞書オブジェクトを設定・取得するにゃ
 '=================================================
 Public Property Set SkipConditions(val As Object)
     Set pSkipConditions = val
@@ -56,9 +59,10 @@ End Property
 
 
 
-
 '=================================================
 ' プロパティ名 : DefaultValues
+' 引数 : val - 初期値の辞書（Dictionary）
+' 機能 : 各フィールドの初期値設定を保持する辞書オブジェクトを設定・取得するにゃ
 '=================================================
 Public Property Set DefaultValues(val As Object)
     Set pDefaultValues = val
@@ -68,8 +72,11 @@ Public Property Get DefaultValues() As Object
     Set DefaultValues = pDefaultValues
 End Property
 
+
 '=================================================
 ' プロパティ名 : MappingMode
+' 引数 : val - マッピングモード（"タイトル一致", "取込情報テーブル"）
+' 機能 : 取込時の項目マッピング方法を選択して、対応する処理を呼び出すにゃ
 '=================================================
 Public Property Let MappingMode(val As String)
     Select Case val
@@ -79,36 +86,51 @@ Public Property Let MappingMode(val As String)
     End Select
 End Property
 
+
 '=================================================
 ' プロパティ名 : fieldNames
+' 引数 : val - タイトル行の配列
+' 機能 : 配列の見出し情報から項目位置を特定して、列マッピングを生成するにゃ
 '=================================================
 Public Property Let fieldNames(val As Variant)
     PrepareFieldNames val
 End Property
 
+
 '=================================================
 ' プロパティ名 : ImportTableName
+' 引数 : val - 取込設定テーブルのテーブル名
+' 機能 : フィールドマッピング用に参照するテーブル名を保持するにゃ
 '=================================================
 Public Property Let ImportTableName(val As String)
     pImportTableName = val
 End Property
 
+
 '=================================================
 ' プロパティ名 : ImportSourceFieldName
+' 引数 : val - マッピング元のフィールド名
+' 機能 : 取込設定テーブル内の、マッピング元の列名を指定するにゃ
 '=================================================
 Public Property Let ImportSourceFieldName(val As String)
     pImportSourceFieldName = val
 End Property
 
+
 '=================================================
 ' プロパティ名 : ImportTargetFieldName
+' 引数 : val - マッピング先のフィールド名
+' 機能 : 取込設定テーブル内の、マッピング先の列名を指定するにゃ
 '=================================================
 Public Property Let ImportTargetFieldName(val As String)
     pImportTargetFieldName = val
 End Property
 
+
 '=================================================
 ' サブルーチン名 : PrepareFieldNames
+' 引数 : val - タイトル行の配列（1行N列）
+' 機能 : 見出しの非空列を抽出し、列位置とマッピングを登録するにゃ
 '=================================================
 Private Sub PrepareFieldNames(val As Variant)
     Dim i     As Long
@@ -123,8 +145,11 @@ Private Sub PrepareFieldNames(val As Variant)
     Next i
 End Sub
 
+
 '=================================================
 ' サブルーチン名 : PrepareMappings_ByTitleMatch_Flexible
+' 機能 : タイトルと同じ値でマッピングを構成するにゃ
+'        （取込対象の列名とテーブルの列名が同一の場合を想定）
 '=================================================
 Private Sub PrepareMappings_ByTitleMatch_Flexible()
     Dim fld As Variant
@@ -133,8 +158,10 @@ Private Sub PrepareMappings_ByTitleMatch_Flexible()
     Next fld
 End Sub
 
+
 '=================================================
 ' サブルーチン名 : PrepareMappings_ByImportTable
+' 機能 : 指定された取込設定テーブルからマッピング定義を読み取り、項目名の対応関係を構成するにゃ
 '=================================================
 Private Sub PrepareMappings_ByImportTable()
     Dim rs As DAO.Recordset
@@ -146,8 +173,11 @@ Private Sub PrepareMappings_ByImportTable()
     rs.Close
 End Sub
 
+
 '=================================================
 ' サブルーチン名 : ImportFromArray
+' 引数 : dataArr - 取込対象の2次元配列（タイトルなし）
+' 機能 : 配列データを行ごとに処理し、スキップ条件と初期値補完を考慮しながら仮テーブルへ登録するにゃ
 '=================================================
 Public Sub ImportFromArray(dataArr As Variant)
     Dim rs      As DAO.Recordset
@@ -217,6 +247,8 @@ End Function
 
 '=================================================
 ' サブルーチン名 : CommitToMain
+' 機能 : 仮テーブル（TempTableName）の内容を本テーブル（tableName）へ一括で登録するにゃ
+'        INSERT INTO ～ SELECT 文を使って、全件コピーする処理にゃ
 '=================================================
 Public Sub CommitToMain()
     pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
