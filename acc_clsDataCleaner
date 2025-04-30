@@ -35,7 +35,7 @@ End Function
 ' 関数名 : CleanDate
 ' 説明　 : NULL補完＋日付型に安全変換するにゃ
 '=====================================
-Public Function CleanDate(val As Variant, Optional defaultDate As Date = #1900/1/1#) As Date
+Public Function CleanDate(val As Variant, Optional defaultDate As Date = #1/1/1900#) As Date
     If IsNull(val) Or Not IsDate(val) Then
         CleanDate = defaultDate
     Else
@@ -117,7 +117,7 @@ End Function
 ' 関数名 : TextToDate
 ' 説明　 : テキスト型を日付型に安全変換するにゃ
 '=====================================
-Public Function TextToDate(val As Variant, Optional defaultDate As Date = #1900/1/1#) As Date
+Public Function TextToDate(val As Variant, Optional defaultDate As Date = #1/1/1900#) As Date
     If IsNull(val) Or Trim(val) = "" Then
         TextToDate = defaultDate
     ElseIf IsDate(val) Then
