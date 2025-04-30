@@ -11,28 +11,44 @@ Option Explicit
 
 '=================================================
 ' 関数名 : RangeToArray
+' 引数 : ws - 対象のワークシート
+'        rng - 対象のセル範囲
+' 戻り値 : セル範囲の2次元配列（Variant）
+' 機能 : 指定範囲の値を配列として取得するにゃ
 '=================================================
 Public Function RangeToArray(ws As Worksheet, rng As Range) As Variant
-    RangeToArray = rng.Value
+    RangeToArray = rng.value
 End Function
 
 '=================================================
 ' サブルーチン名 : ArrayToRange
+' 引数 : ws - 対象のワークシート
+'        targetRng - 書き込み対象のセル範囲
+'        data - 2次元配列（Variant）
+' 機能 : 配列データを指定範囲に一括で書き込むにゃ
 '=================================================
 Public Sub ArrayToRange(ws As Worksheet, targetRng As Range, data As Variant)
-    targetRng.Value = data
+    targetRng.value = data
 End Sub
 
 '=================================================
 ' 関数名 : GetLastRow
+' 引数 : ws - 対象のワークシート
+'        col（省略可）- チェックする列番号（既定値 = 1）
+' 戻り値 : 最終行番号（Long）
+' 機能 : 指定列の最下端までのうち、最終データ行を取得するにゃ
 '=================================================
 Public Function GetLastRow(ws As Worksheet, Optional col As Variant) As Long
     If IsMissing(col) Then col = 1
-    GetLastRow = ws.Cells(ws.Rows.Count, col).End(xlUp).Row
+    GetLastRow = ws.Cells(ws.Rows.Count, col).End(xlUp).row
 End Function
 
 '=================================================
 ' 関数名 : GetLastColumn
+' 引数 : ws - 対象のワークシート
+'        row（省略可）- チェックする行番号（既定値 = 1）
+' 戻り値 : 最終列番号（Long）
+' 機能 : 指定行の右端までのうち、最終データ列を取得するにゃ
 '=================================================
 Public Function GetLastColumn(ws As Worksheet, Optional row As Variant) As Long
     If IsMissing(row) Then row = 1
