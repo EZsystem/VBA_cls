@@ -13,6 +13,8 @@ Private pDebugMode As Boolean
 
 '=================================================
 ' サブルーチン名 : Initialize
+' 引数 : debugMode（省略可）- デバッグ出力の有無（初期値：True）
+' 機能 : エラー記録用のコレクションを初期化し、デバッグモードを設定するにゃ
 '=================================================
 Public Sub Initialize(Optional debugMode As Boolean = True)
     Set pErrors = New Collection
@@ -21,6 +23,9 @@ End Sub
 
 '=================================================
 ' サブルーチン名 : LogError
+' 引数 : title - エラータイトル
+'        details - エラー詳細メッセージ
+' 機能 : エラー情報をログとしてコレクションに追加し、デバッグモード時は即時出力も行うにゃ
 '=================================================
 Public Sub LogError(title As String, details As String)
     Dim msg As String
@@ -31,6 +36,8 @@ End Sub
 
 '=================================================
 ' サブルーチン名 : ShowAllErrors
+' 引数 : showInMsgBox（省略可）- MsgBoxで表示するかどうか
+' 機能 : 記録されたすべてのエラーログを一括表示（またはデバッグ出力）するにゃ
 '=================================================
 Public Sub ShowAllErrors(Optional showInMsgBox As Boolean = True)
     Dim errMsg As String
@@ -50,7 +57,8 @@ Public Sub ShowAllErrors(Optional showInMsgBox As Boolean = True)
 End Sub
 
 '=================================================
-' プロパティ名 : ErrorCount
+' プロパティ名 : Get ErrorCount
+' 機能 : 記録されているエラーの件数を返すにゃ
 '=================================================
 Public Property Get ErrorCount() As Long
     ErrorCount = pErrors.Count
@@ -58,6 +66,11 @@ End Property
 
 '=================================================
 ' 関数名 : GetDefaultValue
+' 引数 : fieldType - フィールド型（DAO定数）
+'        value - 入力値（Variant）
+' 戻り値 : 適切な初期値（型別）
+' 機能 : フィールド型と値の内容に応じて、適切な初期値を返すにゃ
+'        NULLや不正な数値などを補完する安全対策用関数にゃ
 '=================================================
 Public Function GetDefaultValue(fieldType As Integer, value As Variant) As Variant
     On Error Resume Next
