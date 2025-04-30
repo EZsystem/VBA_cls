@@ -1,38 +1,121 @@
-'=====================================
-' Class Module: xl_clsWorkbookManager
-' 説明　：ワークブックの開閉、保存、および別名保存操作を提供するユーティリティ
-' 作成日：2025/04/25
-' 更新日：再生成 by そうじろう
-'=====================================
+'gitにはまだアップしていないよ。2025年04月30日(水)8:26
+'========================================
+' クラス名　　: xl_clsWorkbookManager
+' 説明　　　　: Excelファイルを開閉・管理するユーティリティクラス
+' 作成日　　　: 2025/04/29
+' 作成者　　　: そうじろう（そうちゃん）
+'========================================
+
+Option Compare Database
 Option Explicit
 
-' --- 内部保持変数 ---
-'（このクラスでは内部変数はありません）
+' --- 内部変数 ---
+Private xlApp As Object
+Private wb As Workbook
 
-'=================================================
+'========================================
+' サブルーチン名 : Init
+' 引数 : showExcel（省略可）- Excelウィンドウを表示するか（初期値:非表示）
+' 機能 : Excel.Application を起動してオブジェクトを保持するにゃ
+'========================================
+Public Sub Init(Optional showExcel As Boolean = False)
+    Set xlApp = CreateObject("Excel.Application")
+    xlApp.Visible = showExcel
+End Sub
+
+'========================================
 ' 関数名 : OpenWorkbook
-'=================================================
+' 引数 : path - ファイルパス
+'        ReadOnly（省略可）- 読み取り専用で開くか（Falseで書き込み可）
+' 戻り値 : 開かれた Workbook オブジェクト
+' 機能 : 指定パスのExcelファイルを開いて返すにゃ
+'========================================
 Public Function OpenWorkbook(path As String, Optional ReadOnly As Boolean = False) As Workbook
-    Set OpenWorkbook = Application.Workbooks.Open(Filename:=path, ReadOnly:=ReadOnly)
+    Set wb = xlApp.Workbooks.Open(fileName:=path, ReadOnly:=ReadOnly)
+    Set OpenWorkbook = wb
 End Function
 
-'=================================================
-' サブルーチン名 : CloseWorkbook
-'=================================================
-Public Sub CloseWorkbook(wb As Workbook, Optional SaveChanges As Boolean = False)
-    wb.Close SaveChanges:=SaveChanges
-End Sub
+'========================================
+' プロパティ名 : GetWorkbook
+' 戻り値 : 保持している Workbook オブジェクト
+' 機能 : 現在開かれているブックオブジェクトを返すにゃ
+'========================================
+Public Property Get GetWorkbook() As Workbook
+    Set GetWorkbook = wb
+End Property
 
-'=================================================
+'========================================
+' 関数名 : GetSheet
+' 引数 : identifier - シート名 または インデックス
+' 戻り値 : 対象の Worksheet オブジェクト
+' 機能 : 指定された名前 or インデックスのシートを取得するにゃ
+'========================================
+Public Function GetSheet(identifier As Variant) As Object
+    If wb Is Nothing Then
+        MsgBox "GetSheet にて wb が Nothing にゃ！", vbCritical
+        Exit Function
+    End If
+
+    If IsNumeric(identifier) Then
+        Set GetSheet = wb.Sheets(CLng(identifier))
+    Else
+        Set GetSheet = wb.Sheets(CStr(identifier))
+    End If
+End Function
+
+'========================================
 ' サブルーチン名 : SaveWorkbook
-'=================================================
-Public Sub SaveWorkbook(wb As Workbook)
-    wb.Save
+' 機能 : 開いているブックをそのまま保存するにゃ
+'========================================
+Public Sub SaveWorkbook()
+    If Not wb Is Nothing Then wb.Save
 End Sub
 
-'=================================================
+'========================================
 ' サブルーチン名 : SaveWorkbookAs
-'=================================================
-Public Sub SaveWorkbookAs(wb As Workbook, path As String)
-    wb.SaveAs Filename:=path
+' 引数 : path - 新しく保存するパス
+' 機能 : 開いているブックを別名で保存するにゃ
+'========================================
+Public Sub SaveWorkbookAs(path As String)
+    If Not wb Is Nothing Then wb.SaveAs fileName:=path
 End Sub
+
+'========================================
+' サブルーチン名 : CloseWorkbook
+' 引数 : SaveChanges（省略可）- 保存して閉じるかどうか（Falseで保存しない）
+' 機能 : 開いているブックを閉じて、Workbook 変数を解放するにゃ
+'========================================
+Public Sub CloseWorkbook(Optional SaveChanges As Boolean = False)
+    If Not wb Is Nothing Then wb.Close SaveChanges:=SaveChanges
+    Set wb = Nothing
+End Sub
+
+'========================================
+' サブルーチン名 : QuitExcel
+' 機能 : Excelアプリケーションを終了し、オブジェクトも解放するにゃ
+'========================================
+Public Sub QuitExcel()
+    If Not xlApp Is Nothing Then
+        xlApp.Quit
+        Set xlApp = Nothing
+    End If
+End Sub
+
+'========================================
+' プロパティ名 : HasExcelApp
+' 戻り値 : Excelアプリケーションオブジェクトが有効かどうか
+' 機能 : Excel が起動されているかを返すにゃ
+'========================================
+Public Property Get HasExcelApp() As Boolean
+    HasExcelApp = Not xlApp Is Nothing
+End Property
+
+'========================================
+' プロパティ名 : HasWorkbook
+' 戻り値 : Workbook オブジェクトが有効かどうか
+' 機能 : ブックが開かれているかを返すにゃ
+'========================================
+Public Property Get HasWorkbook() As Boolean
+    HasWorkbook = Not wb Is Nothing
+End Property
+
