@@ -1,32 +1,32 @@
 ファイル名	クラス名	行数	関数・プロパティ名	目的	呼び出し元	依存クラス	備考	不明点
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	CleanText	NULL補完＋Trimして安全な文字列を返すにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	CleanNumber	NULL補完＋数値型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	CleanDate	NULL補完＋日付型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToInteger	テキスト型をInteger型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToLong	テキスト型をLong型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToSingle	テキスト型をSingle型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToDouble	テキスト型をDouble型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToCurrency	テキスト型をCurrency型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToDate	テキスト型を日付型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	TextToBoolean	テキスト型をブール型に変換するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	IsNumericStrict	厳密な数値判定をするにゃ		DAO,com_clsCalcHelperなど		
-acc_clsDataCleaner(2).txt	acc_clsDataCleaner	171	IsDateStrict	厳密な日付判定をするにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	CleanText	NULL補完＋Trimして安全な文字列を返すにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	CleanNumber	NULL補完＋数値型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	CleanDate	NULL補完＋日付型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToInteger	テキスト型をInteger型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToLong	テキスト型をLong型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToSingle	テキスト型をSingle型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToDouble	テキスト型をDouble型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToCurrency	テキスト型をCurrency型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToDate	テキスト型を日付型に安全変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	TextToBoolean	テキスト型をブール型に変換するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	IsNumericStrict	厳密な数値判定をするにゃ		DAO,com_clsCalcHelperなど		
+acc_clsDataCleaner.txt	acc_clsDataCleaner	171	IsDateStrict	厳密な日付判定をするにゃ		DAO,com_clsCalcHelperなど		
 acc_clsDbConnector.txt	acc_clsDbConnector	41	Init	DAO.Database オブジェクト（CurrentDb）を初期化して内部に保持する		DAO,com_clsCalcHelperなど		
 acc_clsDbConnector.txt	acc_clsDbConnector	41	Get DB	保持している DAO.Database オブジェクトを返すプロパティ（定義抜け or コメントのみ）		DAO,com_clsCalcHelperなど		
 acc_clsDbConnector.txt	acc_clsDbConnector	41	ExecuteSQL	渡されたSQLを実行するユーティリティ（エラー制御オプション付き）		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	Init	データベース接続（CurrentDb）および各種辞書オブジェクトを初期化するにゃ,項目マッピング、有効フィールド、列マッピング、スキップ条件、初期値設定の各辞書を作成するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	SetSkipConditions	スキップ条件の辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	GetSkipConditions	スキップ条件の辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	SetDefaultValues	各フィールドの初期値設定を保持する辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	GetDefaultValues	各フィールドの初期値設定を保持する辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	LetMappingMode	取込時の項目マッピング方法を選択して、対応する処理を呼び出すにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	LetfieldNames	配列の見出し情報から項目位置を特定して、列マッピングを生成するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	LetImportTableName	フィールドマッピング用に参照するテーブル名を保持するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	LetImportSourceFieldName	取込設定テーブル内の、マッピング元の列名を指定するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	LetImportTargetFieldName	取込設定テーブル内の、マッピング先の列名を指定するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	ImportFromArray	配列データを行ごとに処理し、スキップ条件と初期値補完を考慮しながら仮テーブルへ登録するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	CommitToMain	仮テーブル（TempTableName）の内容を本テーブル（tableName）へ一括で登録するにゃINSERT INTO ～ SELECT 文を使って、全件コピーする処理にゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	ImportFromWorksheet	指定行列からタイトルとデータを取得し、ImportFromArrayに渡す		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	Init	データベース接続（CurrentDb）および各種辞書オブジェクトを初期化するにゃ,項目マッピング、有効フィールド、列マッピング、スキップ条件、初期値設定の各辞書を作成するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	SetSkipConditions	スキップ条件の辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	GetSkipConditions	スキップ条件の辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	SetDefaultValues	各フィールドの初期値設定を保持する辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	GetDefaultValues	各フィールドの初期値設定を保持する辞書オブジェクトを設定・取得するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	LetMappingMode	取込時の項目マッピング方法を選択して、対応する処理を呼び出すにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	LetfieldNames	配列の見出し情報から項目位置を特定して、列マッピングを生成するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	LetImportTableName	フィールドマッピング用に参照するテーブル名を保持するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	LetImportSourceFieldName	取込設定テーブル内の、マッピング元の列名を指定するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	LetImportTargetFieldName	取込設定テーブル内の、マッピング先の列名を指定するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	ImportFromArray	配列データを行ごとに処理し、スキップ条件と初期値補完を考慮しながら仮テーブルへ登録するにゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	CommitToMain	仮テーブル（TempTableName）の内容を本テーブル（tableName）へ一括で登録するにゃINSERT INTO ～ SELECT 文を使って、全件コピーする処理にゃ		DAO,com_clsCalcHelperなど		
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	ImportFromWorksheet	指定行列からタイトルとデータを取得し、ImportFromArrayに渡す		DAO,com_clsCalcHelperなど		
 acc_clsTableCleaner.txt	acc_clsTableCleaner	46	Init	DAO.Database を初期化し、テーブル名格納用の Collection を作成するにゃ		DAO,com_clsCalcHelperなど		
 acc_clsTableCleaner.txt	acc_clsTableCleaner	46	AddTable	クレンジングや削除対象として保持するテーブル名をリストに追加するにゃ		DAO,com_clsCalcHelperなど		
 acc_clsTableCleaner.txt	acc_clsTableCleaner	46	ClearAll	登録済みテーブルは `AddTable` 経由で追加されたものにゃ		DAO,com_clsCalcHelperなど		
@@ -106,10 +106,10 @@ xl_clsWorkbookManager.txt	xl_clsWorkbookManager	50	SaveWorkbook	開いている�
 xl_clsWorkbookManager.txt	xl_clsWorkbookManager	50	SaveWorkbookAs	開いているブックを別名で保存するにゃ				
 xl_clsWorkbookManager.txt	xl_clsWorkbookManager	50	CloseWorkbook	開いているブックを閉じて、Workbook 変数を解放するにゃ		DAO,com_clsCalcHelperなど		
 xl_clsWorkbookManager.txt	xl_clsWorkbookManager	50	SaveWorkbook	Excelアプリケーションを終了し、オブジェクトも解放するにゃ		DAO,com_clsCalcHelperなど		
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	PrepareFieldNames	見出しの非空列を抽出し、列位置とマッピングを登録するにゃ				
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	PrepareMappings_ByTitleMatch_Flexible	タイトルと同じ値でマッピングを構成するにゃ （取込対象の列名とテーブルの列名が同一の場合を想定）				
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	PrepareMappings_ByImportTable	指定された取込設定テーブルからマッピング定義を読み取り、項目名の対応関係を構成するにゃ				
-acc_clsExcelImporter(4).txt	acc_clsExcelImporter	260	ShouldSkip	取込対象データがスキップ条件に一致するかを判定するにゃ				
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	PrepareFieldNames	見出しの非空列を抽出し、列位置とマッピングを登録するにゃ				
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	PrepareMappings_ByTitleMatch_Flexible	タイトルと同じ値でマッピングを構成するにゃ （取込対象の列名とテーブルの列名が同一の場合を想定）				
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	PrepareMappings_ByImportTable	指定された取込設定テーブルからマッピング定義を読み取り、項目名の対応関係を構成するにゃ				
+acc_clsExcelImporter.txt	acc_clsExcelImporter	260	ShouldSkip	取込対象データがスキップ条件に一致するかを判定するにゃ				
 acc_clsTableTransfer.txt	acc_clsTableTransfer	69	TransferTable	転送先の既存データをキーで削除後、転送元の全件を挿入するにゃ  DELETE + INSERT INTO を連続実行する構造にゃ				
 com_clsDateMath.txt	com_clsDateMath	183	ValidateDate	指定された年月日が有効な日付かを検証するにゃ（DateSerial を使用）				
 com_clsDateMath.txt	com_clsDateMath	183	RoundToDigits	指定桁数で四捨五入された値を返すにゃ				
