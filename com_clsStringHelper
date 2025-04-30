@@ -12,6 +12,10 @@ Option Explicit
 
 '=================================================
 ' 関数名 : SplitToArray
+' 引数 : s - 区切る対象の文字列
+'        delimiter - 区切り文字
+' 戻り値 : 分割後の文字列配列（Variant）
+' 機能 : 指定した文字列を区切り文字で分割して配列として返すにゃ
 '=================================================
 Public Function SplitToArray(s As String, delimiter As String) As Variant
     SplitToArray = Split(s, delimiter)
@@ -19,6 +23,9 @@ End Function
 
 '=================================================
 ' 関数名 : JoinArray
+' 引数 : arr - 結合対象の配列
+'        delimiter - 結合に使う文字
+' 機能 : 配列内の要素を指定の区切り文字で連結し、文字列として返すにゃ
 '=================================================
 Public Function JoinArray(arr As Variant, delimiter As String) As String
     JoinArray = Join(arr, delimiter)
@@ -26,6 +33,8 @@ End Function
 
 '=================================================
 ' 関数名 : ToUpper
+' 引数 : s - 対象文字列
+' 機能 : 指定された文字列をすべて大文字に変換して返すにゃ
 '=================================================
 Public Function ToUpper(s As String) As String
     ToUpper = UCase(s)
@@ -33,6 +42,8 @@ End Function
 
 '=================================================
 ' 関数名 : ToLower
+' 引数 : s - 対象文字列
+' 機能 : 指定された文字列をすべて小文字に変換して返すにゃ
 '=================================================
 Public Function ToLower(s As String) As String
     ToLower = LCase(s)
@@ -40,6 +51,9 @@ End Function
 
 '=================================================
 ' 関数名 : ContainsText
+' 引数 : s - 対象文字列
+'        keyword - 検索語句
+' 機能 : 文字列 s に keyword が含まれているかを判定して返すにゃ（大文字小文字は無視）
 '=================================================
 Public Function ContainsText(s As String, keyword As String) As Boolean
     ContainsText = (InStr(1, s, keyword, vbTextCompare) > 0)
@@ -47,6 +61,10 @@ End Function
 
 '=================================================
 ' 関数名 : ReplaceAll
+' 引数 : s - 対象文字列
+'        find - 検索語句
+'        repl - 置換文字列
+' 機能 : 文字列 s に含まれる find を repl にすべて置換して返すにゃ
 '=================================================
 Public Function ReplaceAll(s As String, find As String, repl As String) As String
     ReplaceAll = Replace(s, find, repl)
