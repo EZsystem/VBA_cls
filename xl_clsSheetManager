@@ -11,6 +11,10 @@ Option Explicit
 
 '=================================================
 ' 関数名 : SheetExists
+' 引数 : wb - 対象の Workbook  
+'        sheetName - チェック対象のシート名  
+' 戻り値 : シートが存在すれば True
+' 機能 : 指定されたシートが Workbook 内に存在するかどうかを判定するにゃ
 '=================================================
 Public Function SheetExists(wb As Workbook, sheetName As String) As Boolean
     On Error Resume Next
@@ -22,6 +26,10 @@ End Function
 
 '=================================================
 ' 関数名 : GetSheet
+' 引数 : wb - 対象の Workbook  
+'        sheetName - 対象シート名  
+' 戻り値 : Worksheet オブジェクト
+' 機能 : 指定されたシートを取得して返すにゃ（存在しない場合はエラーを出すにゃ）
 '=================================================
 Public Function GetSheet(wb As Workbook, sheetName As String) As Worksheet
     If SheetExists(wb, sheetName) Then
@@ -33,6 +41,9 @@ End Function
 
 '=================================================
 ' サブルーチン名 : UnprotectSheet
+' 引数 : ws - 対象の Worksheet  
+'        password（省略可）- 保護解除用パスワード  
+' 機能 : 対象シートが保護されている場合に、指定パスワードで保護を解除するにゃ
 '=================================================
 Public Sub UnprotectSheet(ws As Worksheet, Optional password As String = "")
     If ws.ProtectContents Then ws.Unprotect password
@@ -40,6 +51,10 @@ End Sub
 
 '=================================================
 ' サブルーチン名 : ProtectSheet
+' 引数 : ws - 対象の Worksheet  
+'        password（省略可）- 保護パスワード  
+'        DrawingObjects, Contents, Scenarios（省略可）- 保護対象の項目  
+' 機能 : 指定された設定でシートを保護するにゃ（パスワード付き保護も可）
 '=================================================
 Public Sub ProtectSheet(ws As Worksheet, Optional password As String = "", Optional DrawingObjects As Boolean = True, Optional Contents As Boolean = True, Optional Scenarios As Boolean = True)
     ws.Protect password:=password, DrawingObjects:=DrawingObjects, Contents:=Contents, Scenarios:=Scenarios
