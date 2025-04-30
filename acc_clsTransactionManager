@@ -13,14 +13,18 @@ Private pInTransaction As Boolean
 
 '=================================================
 ' サブルーチン名 : Init
+' 引数 : DB - 操作対象の DAO.Database オブジェクト
+' 機能 : データベースを初期化し、トランザクション未開始状態に設定するにゃ
 '=================================================
-Public Sub Init(db As DAO.Database)
-    Set pDB = db
+Public Sub Init(DB As DAO.Database)
+    Set pDB = DB
     pInTransaction = False
 End Sub
 
 '=================================================
 ' サブルーチン名 : BeginTransaction
+' 機能 : トランザクションを開始するにゃ
+'        すでに開始済みの場合は何もしないように制御してるにゃ
 '=================================================
 Public Sub BeginTransaction()
     If Not pInTransaction Then
@@ -31,6 +35,8 @@ End Sub
 
 '=================================================
 ' サブルーチン名 : Commit
+' 機能 : トランザクションをコミットして確定するにゃ
+'        実行中のトランザクションがある場合のみ動作するにゃ
 '=================================================
 Public Sub Commit()
     If pInTransaction Then
@@ -41,6 +47,8 @@ End Sub
 
 '=================================================
 ' サブルーチン名 : Rollback
+' 機能 : トランザクションをロールバックして元に戻すにゃ
+'        実行中のトランザクションがある場合のみ動作するにゃ
 '=================================================
 Public Sub Rollback()
     If pInTransaction Then
