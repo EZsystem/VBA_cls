@@ -12,6 +12,8 @@ Option Explicit
 
 '=================================================
 ' 関数名 : FileExists
+' 引数 : path - 確認対象のファイルパス
+' 機能 : 指定パスのファイルが存在するかどうかを返すにゃ
 '=================================================
 Public Function FileExists(path As String) As Boolean
     FileExists = (Dir(path) <> "")
@@ -19,6 +21,8 @@ End Function
 
 '=================================================
 ' 関数名 : GetFileName
+' 引数 : path - フルパス文字列
+' 機能 : フルパスからファイル名部分だけを抽出して返すにゃ
 '=================================================
 Public Function GetFileName(path As String) As String
     GetFileName = Mid(path, InStrRev(path, "\") + 1)
@@ -26,6 +30,8 @@ End Function
 
 '=================================================
 ' 関数名 : GetFolder
+' 引数 : path - フルパス文字列
+' 機能 : フルパスからフォルダパス部分を抽出して返すにゃ
 '=================================================
 Public Function GetFolder(path As String) As String
     GetFolder = Left(path, InStrRev(path, "\") - 1)
@@ -33,6 +39,10 @@ End Function
 
 '=================================================
 ' 関数名 : ReadTextFile
+' 引数 : path - 読込対象のファイルパス
+' 戻り値 : ファイルの全内容（文字列）
+' 機能 : 指定されたテキストファイルを開いて内容を一括読込するにゃ
+'        存在しない場合はエラーを出すにゃ
 '=================================================
 Public Function ReadTextFile(path As String) As String
     Dim txt As String, f As Integer
@@ -46,6 +56,9 @@ End Function
 
 '=================================================
 ' サブルーチン名 : WriteTextFile
+' 引数 : path - 出力先ファイルパス
+'        content - 書き込み内容
+' 機能 : 指定されたパスにテキストを書き込むにゃ（上書きモード）
 '=================================================
 Public Sub WriteTextFile(path As String, content As String)
     Dim f As Integer
