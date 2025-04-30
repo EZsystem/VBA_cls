@@ -17,6 +17,8 @@ Private Const BASE_YEAR As Integer = 2012
 
 '=================================================
 ' プロパティ名 : rawValue
+' 引数 : v - 日付文字列（例: "202404", "20240401"）
+' 機能 : 生データ文字列を格納し、解析処理（ParseValue）を実行するにゃ
 '=================================================
 Public Property Let rawValue(v As String)
     pRawValue = Trim(v)
@@ -29,6 +31,7 @@ End Property
 
 '=================================================
 ' プロパティ名 : IsValid
+' 機能 : 格納された日付が正しい形式（存在する日付）であるかを返すにゃ
 '=================================================
 Public Property Get IsValid() As Boolean
     IsValid = pIsValid
@@ -36,6 +39,7 @@ End Property
 
 '=================================================
 ' 関数名 : GetYear
+' 機能 : 解析された年（4桁）を返すにゃ
 '=================================================
 Public Function GetYear() As Integer
     GetYear = pYear
@@ -43,6 +47,7 @@ End Function
 
 '=================================================
 ' 関数名 : GetMonth
+' 機能 : 解析された月（1?12）を返すにゃ
 '=================================================
 Public Function GetMonth() As Integer
     GetMonth = pMonth
@@ -50,6 +55,7 @@ End Function
 
 '=================================================
 ' 関数名 : GetDay
+' 機能 : 解析された日（固定：1 または 文字列から抽出）を返すにゃ
 '=================================================
 Public Function GetDay() As Integer
     GetDay = pDay
@@ -57,6 +63,7 @@ End Function
 
 '=================================================
 ' 関数名 : GetDateValue
+' 機能 : 年月日を合成して日付型で返すにゃ（無効な場合は Null）
 '=================================================
 Public Function GetDateValue() As Variant
     If pIsValid Then
@@ -68,6 +75,7 @@ End Function
 
 '=================================================
 ' 関数名 : GetFiscalYear
+' 機能 : 3月を区切りとして会計年度を返すにゃ（1?3月は前年に補正）
 '=================================================
 Public Function GetFiscalYear() As Integer
     Dim fy As Integer
@@ -78,6 +86,7 @@ End Function
 
 '=================================================
 ' 関数名 : GetPeriod
+' 機能 : 基準年（BASE_YEAR）との差分を返すにゃ（経過年数などに使うにゃ）
 '=================================================
 Public Function GetPeriod() As Integer
     GetPeriod = GetFiscalYear() - BASE_YEAR
@@ -85,6 +94,7 @@ End Function
 
 '=================================================
 ' 関数名 : GetQuarter
+' 機能 : 会計上の四半期（1?4）を返すにゃ（4?6月：第1四半期 など）
 '=================================================
 Public Function GetQuarter() As Integer
     Select Case pMonth
@@ -98,6 +108,7 @@ End Function
 
 '=================================================
 ' サブルーチン名 : ParseValue
+' 機能 : 文字列（6桁 or 8桁）から年・月・日を抽出し、日付の正当性を検証するにゃ
 '=================================================
 Private Sub ParseValue()
     Dim s As String: s = pRawValue
@@ -122,6 +133,8 @@ End Sub
 
 '=================================================
 ' 関数名 : ValidateDate
+' 引数 : y, m, d - 年月日
+' 機能 : 指定された年月日が有効な日付かを検証するにゃ（DateSerial を使用）
 '=================================================
 Private Function ValidateDate(y As Integer, m As Integer, d As Integer) As Boolean
     On Error GoTo ErrLbl2
@@ -134,6 +147,9 @@ End Function
 
 '=================================================
 ' 関数名 : RoundToDigits
+' 引数 : val - 四捨五入対象の値
+'        digits - 小数点以下の桁数
+' 機能 : 指定桁数で四捨五入された値を返すにゃ
 '=================================================
 Public Function RoundToDigits(val As Variant, digits As Long) As Double
     Dim factor As Double: factor = 10 ^ digits
