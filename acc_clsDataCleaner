@@ -169,3 +169,46 @@ Public Function IsDateStrict(val As Variant) As Boolean
         If IsDate(val) Then IsDateStrict = True
     End If
 End Function
+
+'=================================================
+' 関数名 : GetSupportedVBAType
+' 説明   : 日本語のAccess型名をVBA型名に変換する
+'         対応していない型名の場合はエラーを返す
+' 引数   : jpType（String） 日本語型名（例："長整数型"）
+' 戻り値 : String（"Long", "Date" など）
+'=================================================
+Public Function GetSupportedVBAType(ByVal jpType As String) As String
+    Dim typeName As String
+    typeName = Trim(jpType)
+
+    Select Case typeName
+        Case "テキスト型"
+            GetSupportedVBAType = "String"
+
+        Case "長整数型"
+            GetSupportedVBAType = "Long"
+
+        Case "整数型"
+            GetSupportedVBAType = "Integer"
+
+        Case "単精度型"
+            GetSupportedVBAType = "Single"
+
+        Case "倍精度型"
+            GetSupportedVBAType = "Double"
+
+        Case "通貨型"
+            GetSupportedVBAType = "Currency"
+
+        Case "日付型"
+            GetSupportedVBAType = "Date"
+
+        Case "Yes/No型"
+            GetSupportedVBAType = "Boolean"
+
+        Case Else
+            Debug.Print "【GetSupportedVBAType エラー】未対応の型：" & jpType
+            MsgBox "未対応の型です：" & jpType, vbExclamation, "型変換エラー"
+            Err.Raise vbObjectError + 500, "GetSupportedVBAType", "未対応の型：" & jpType
+    End Select
+End Function
