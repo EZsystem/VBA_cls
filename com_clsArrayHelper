@@ -181,3 +181,33 @@ Public Function GetNumericValue(row As Long, colName As String) As Double
     Dim v As Variant: v = GetValue(row, colName)
     If IsNumeric(v) Then GetNumericValue = CDbl(v) Else GetNumericValue = 0
 End Function
+
+'=================================================
+' 関数名 : ToTextArray
+' 説明   : 任意の2次元配列のすべての値を文字列として整形して返す
+'         Null・数値・改行・空白を安全に変換する
+' 引数   : sourceArray（Variant） 元の2次元配列（行, 列）
+' 戻り値 : Variant（2次元配列）   文字列化された配列
+'=================================================
+Public Function ToTextArray(sourceArray As Variant) As Variant
+    Dim sanitizer As acc_clsTextSanitizer
+    Set sanitizer = New acc_clsTextSanitizer
+
+    Dim rowCount As Long
+    Dim colCount As Long
+
+    rowCount = UBound(sourceArray, 1)
+    colCount = UBound(sourceArray, 2)
+
+    Dim resultArray() As String
+    ReDim resultArray(1 To rowCount, 1 To colCount)
+
+    Dim r As Long, c As Long
+    For r = 1 To rowCount
+        For c = 1 To colCount
+            resultArray(r, c) = sanitizer.CleanText(sourceArray(r, c))
+        Next c
+    Next r
+
+    ToTextArray = resultArray
+End Function    ' ← ToTextArray 終了
