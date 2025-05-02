@@ -212,3 +212,15 @@ Public Function GetSupportedVBAType(ByVal jpType As String) As String
             Err.Raise vbObjectError + 500, "GetSupportedVBAType", "未対応の型：" & jpType
     End Select
 End Function
+
+'=====================================
+' 関数名 : TextToString
+' 説明　 : テキスト型に安全に変換するにゃ（Null→""）
+'=====================================
+Public Function TextToString(val As Variant, Optional defaultValue As String = "") As String
+    If IsNull(val) Then
+        TextToString = defaultValue
+    Else
+        TextToString = CStr(val)
+    End If
+End Function
