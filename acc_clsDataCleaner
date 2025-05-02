@@ -177,9 +177,9 @@ End Function
 ' 引数   : jpType（String） 日本語型名（例："長整数型"）
 ' 戻り値 : String（"Long", "Date" など）
 '=================================================
-Public Function GetSupportedVBAType(ByVal jpType As String) As String
+Public Function GetSupportedVBAType(ByVal jptype As String) As String
     Dim typeName As String
-    typeName = Trim(jpType)
+    typeName = Trim(jptype)
 
     Select Case typeName
         Case "テキスト型"
@@ -191,25 +191,25 @@ Public Function GetSupportedVBAType(ByVal jpType As String) As String
         Case "整数型"
             GetSupportedVBAType = "Integer"
 
-        Case "単精度型"
+        Case "単精度浮動小数点型"
             GetSupportedVBAType = "Single"
 
-        Case "倍精度型"
+        Case "倍精度浮動小数点型"
             GetSupportedVBAType = "Double"
 
         Case "通貨型"
             GetSupportedVBAType = "Currency"
 
-        Case "日付型"
+        Case "日付/時刻型"
             GetSupportedVBAType = "Date"
 
         Case "Yes/No型"
             GetSupportedVBAType = "Boolean"
 
         Case Else
-            Debug.Print "【GetSupportedVBAType エラー】未対応の型：" & jpType
-            MsgBox "未対応の型です：" & jpType, vbExclamation, "型変換エラー"
-            Err.Raise vbObjectError + 500, "GetSupportedVBAType", "未対応の型：" & jpType
+            Debug.Print "【GetSupportedVBAType エラー】未対応の型：" & jptype
+            MsgBox "未対応の型です：" & jptype, vbExclamation, "型変換エラー"
+            Err.Raise vbObjectError + 500, "GetSupportedVBAType", "未対応の型：" & jptype
     End Select
 End Function
 
@@ -224,3 +224,4 @@ Public Function TextToString(val As Variant, Optional defaultValue As String = "
         TextToString = CStr(val)
     End If
 End Function
+
