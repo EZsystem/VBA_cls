@@ -1,58 +1,55 @@
-'=====================================
+'========================================
 ' Class Module: acc_clsTransactionManager
-' 説明　：DAOトランザクションの開始・コミット・ロールバックを管理するクラス
+' 説明　：DAOトランザクション開始・コミット・ロールバックを管理するクラス
 ' 作成日：2025/04/25
-' 更新日：再生成 by そうじろう
-'=====================================
+'========================================
 Option Compare Database
 Option Explicit
 
 ' --- 内部保持変数 ---
-Private pDB            As DAO.Database
+Private pWS            As DAO.Workspace
 Private pInTransaction As Boolean
 
 '=================================================
 ' サブルーチン名 : Init
-' 引数 : DB - 操作対象の DAO.Database オブジェクト
-' 機能 : データベースを初期化し、トランザクション未開始状態に設定するにゃ
+' 機能 : DAO.DefaultWorkspace を初期化し、未開始フラグをリセットする
 '=================================================
-Public Sub Init(DB As DAO.Database)
-    Set pDB = DB
+Public Sub Init()
+    Set pWS = DBEngine.Workspaces(0)
     pInTransaction = False
 End Sub
 
 '=================================================
 ' サブルーチン名 : BeginTransaction
 ' 機能 : トランザクションを開始するにゃ
-'        すでに開始済みの場合は何もしないように制御してるにゃ
+'        すでに開始済みの場合は何もしない
 '=================================================
 Public Sub BeginTransaction()
     If Not pInTransaction Then
-        pDB.BeginTrans
+        pWS.BeginTrans
         pInTransaction = True
     End If
 End Sub
 
 '=================================================
 ' サブルーチン名 : Commit
-' 機能 : トランザクションをコミットして確定するにゃ
-'        実行中のトランザクションがある場合のみ動作するにゃ
+' 機能 : トランザクションをコミットするにゃ
 '=================================================
 Public Sub Commit()
     If pInTransaction Then
-        pDB.CommitTrans
+        pWS.CommitTrans
         pInTransaction = False
     End If
 End Sub
 
 '=================================================
 ' サブルーチン名 : Rollback
-' 機能 : トランザクションをロールバックして元に戻すにゃ
-'        実行中のトランザクションがある場合のみ動作するにゃ
+' 機能 : トランザクションをロールバックするにゃ
 '=================================================
 Public Sub Rollback()
     If pInTransaction Then
-        pDB.Rollback
+        pWS.Rollback
         pInTransaction = False
     End If
 End Sub
+
