@@ -180,32 +180,53 @@ End Sub
 ' 機能 : 配列データを行ごとに処理し、スキップ条件と初期値補完を考慮しながら仮テーブルへ登録するにゃ
 '=================================================
 Public Sub ImportFromArray(dataArr As Variant)
-    Dim rs      As DAO.Recordset
+    Dim rs    As DAO.Recordset
     Set rs = pDB.OpenRecordset(TempTableName, dbOpenDynaset)
-    Dim r       As Long
-    Dim c       As Variant
-    Dim fld     As String
+    
+    Dim r     As Long
+    Dim c     As Variant
+    Dim fldNum As Long
     Dim valCell As Variant
-
+    
+    ' ■ 行ループを追加 ■
     For r = 1 To UBound(dataArr, 1)
-        If Not ShouldSkip(dataArr, r) Then
-            rs.AddNew
-            For Each c In pColMapping.Keys
-                fld = pColMapping(c)
-                valCell = dataArr(r, c)
-                If (IsNull(valCell) Or Trim(CStr(valCell)) = "") Then
-                    If Not pDefaultValues Is Nothing Then
-                        If pDefaultValues.Exists(fld) Then _
-                            valCell = pDefaultValues(fld)
+        
+        ' スキップ条件に合致すれば次の行へ
+        If shouldSkip(dataArr, r) Then
+            GoTo NextRow
+        End If
+        
+        rs.AddNew
+        
+        ' ■ 列ループ ■
+        For Each c In pColMapping.Keys
+            ' 1) 列番号を取得
+            fldNum = pColMapping(c)
+            
+            ' 2) dataArr の (行, 列番号) を取得
+            valCell = dataArr(r, fldNum)
+            
+            ' 3) 空欄ならデフォルト値に置換（キーは置換前タイトル＝c）
+            If IsNull(valCell) Or Trim(CStr(valCell)) = "" Then
+                If Not pDefaultValues Is Nothing Then
+                    If pDefaultValues.Exists(c) Then
+                        valCell = pDefaultValues(c)
                     End If
                 End If
-                rs.Fields(pDictMapping(fld)).value = valCell
-            Next c
-            rs.Update
-        End If
+            End If
+            
+            ' 4) 置換後のフィールド名でレコードへセット
+            rs.Fields(pDictMapping(c)).value = valCell
+        Next c
+        
+        rs.Update
+        
+NextRow:
     Next r
+    
     rs.Close
 End Sub
+
 
 
 '=================================================
@@ -214,7 +235,7 @@ End Sub
 '        rowIndex - 対象の行番号
 ' 機能 : 取込対象データがスキップ条件に一致するかを判定するにゃ
 '=================================================
-Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
+Private Function shouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
     Dim fn As Variant
     Dim cell As String
     Dim patterns As Variant
@@ -234,7 +255,7 @@ Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
             ' ★ 各パターンと一致するかチェック
             For Each pat In patterns
                 If cell Like pat Then
-                    ShouldSkip = True
+                    shouldSkip = True
                     Exit Function
                 End If
             Next pat
@@ -270,7 +291,7 @@ Public Sub ImportFromWorksheet(ws As Object)
 
     ' ImportColumnMaxが0なら、タイトル行から列数を自動判定するにゃ！
     If ImportColumnMax = 0 Then
-        lastCol = ws.Cells(TitleRow, ws.Columns.Count).End(-4159).Column ' xlToLeft
+        lastCol = ws.Cells(TitleRow, ws.Columns.count).End(-4159).Column ' xlToLeft
         ImportColumnMax = lastCol - StartColumn + 1
     End If
 
@@ -279,7 +300,7 @@ Public Sub ImportFromWorksheet(ws As Object)
     fieldNames = titleArr
 
     ' --- データ最終行取得 ---
-    lastRow = ws.Cells(ws.Rows.Count, StartColumn).End(-4162).row
+    lastRow = ws.Cells(ws.Rows.count, StartColumn).End(-4162).row
 
     ' --- データ読み込み ---
     dataArr = ws.Range(ws.Cells(DataStartRow, StartColumn), ws.Cells(lastRow, StartColumn + ImportColumnMax - 1)).value
