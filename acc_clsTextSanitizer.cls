@@ -1,0 +1,89 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "acc_clsTextSanitizer"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'=====================================
+' Class Module: acc_clsTextSanitizer
+' 説明　：Access仮テーブル処理向けの文字列安全化クラス
+'　　　　Null、空文字、制御文字の除去や初期値補完を行う
+' 作成日：2025/04/30
+' 更新日：-
+'=====================================
+
+Option Compare Database
+Option Explicit
+
+' --- 外部公開用関数 ---
+
+'=================================================
+' 関数名 : CleanText
+' 説明   : 値を文字列化し、空白と改行を除去する
+' 引数   : value（Variant）        変換対象の値
+'        : defaultValue（String）  Null時の返却値（既定値: ""）
+' 戻り値 : String                  整形済みの文字列
+'=================================================
+Public Function CleanText(ByVal value As Variant, _
+                          Optional ByVal defaultValue As String = "") As String
+    If IsNull(value) Then
+        CleanText = defaultValue
+    Else
+        CleanText = Trim(Replace(CStr(value), vbCrLf, ""))
+    End If
+End Function    ' ← CleanText 終了
+
+'=================================================
+' 関数名 : IsEmptyText
+' 説明   : 値がNullまたは空文字かを判定する
+' 引数   : value（Variant） 判定対象の値
+' 戻り値 : Boolean           Trueなら空欄、Falseなら値あり
+'=================================================
+Public Function IsEmptyText(ByVal value As Variant) As Boolean
+    If IsNull(value) Then
+        IsEmptyText = True
+    Else
+        IsEmptyText = (Trim(CStr(value)) = "")
+    End If
+End Function    ' ← IsEmptyText 終了
+
+'=================================================
+' 関数名 : RemoveInvisibleChars
+' 説明   : ノンブレークスペースや制御文字を削除する
+' 引数   : value（String） 対象の文字列
+' 戻り値 : String           制御文字を除去した文字列
+'=================================================
+Public Function RemoveInvisibleChars(ByVal value As String) As String
+    Dim cleaned As String
+
+    cleaned = Replace(value, vbTab, "")
+    cleaned = Replace(cleaned, Chr(160), "")    ' ノンブレークスペース
+    cleaned = Replace(cleaned, vbCrLf, "")
+    cleaned = Replace(cleaned, Chr(13), "")
+    cleaned = Replace(cleaned, Chr(10), "")
+
+    RemoveInvisibleChars = Trim(cleaned)
+End Function    ' ← RemoveInvisibleChars 終了
+
+'=================================================
+' 関数名 : CleanWithFallback
+' 説明   : Nullまたは空欄の場合、代替文字列を返す
+' 引数   : value（Variant）        対象の値
+'        : fallback（String）      代替文字列（既定値: "0"）
+' 戻り値 : String                  結果文字列
+'=================================================
+Public Function CleanWithFallback(ByVal value As Variant, _
+                                  Optional ByVal fallback As String = "0") As String
+    If IsNull(value) Or Trim(CStr(value)) = "" Then
+        CleanWithFallback = fallback
+    Else
+        CleanWithFallback = Trim(CStr(value))
+    End If
+End Function    ' ← CleanWithFallback 終了
+
+
+
+

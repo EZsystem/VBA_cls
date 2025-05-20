@@ -1,0 +1,47 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "acc_clsDbConnector"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'=====================================
+' Class Module: acc_clsDbConnector
+' 説明　：DAO.Database取得およびSQL実行ラッパーを提供するクラス
+' 作成日：2025/04/25
+' 更新日：再生成 by そうじろう
+'=====================================
+Option Compare Database
+Option Explicit
+
+' --- 内部保持変数 ---
+Private pDB As DAO.Database
+
+'=================================================
+' サブルーチン名 : Init
+' 機能 : DAO.Database オブジェクト（CurrentDb）を初期化して保持するにゃ
+'=================================================
+Public Sub Init()
+    Set pDB = CurrentDb
+End Sub
+
+'=================================================
+' プロパティ名 : DB
+' 機能 : 内部に保持した DAO.Database オブジェクトを取得するにゃ
+'=================================================
+Public Property Get DB() As DAO.Database
+    Set DB = pDB
+End Property
+
+'=================================================
+' サブルーチン名 : ExecuteSQL
+' 引数 : sql - 実行するSQL文
+'        failOnError - Trueならエラー時に例外を出す（既定値：True）
+' 機能 : SQL文を現在のDB接続で実行するにゃ。エラーハンドリングも対応にゃ
+'=================================================
+Public Sub ExecuteSQL(sql As String, Optional failOnError As Boolean = True)
+    pDB.Execute sql, IIf(failOnError, dbFailOnError, dbSeeChanges)
+End Sub
+

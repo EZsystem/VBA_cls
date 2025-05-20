@@ -1,0 +1,303 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "acc_clsExcelImporter"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'=====================================
+' Class Module: acc_clsExcelImporter
+' 説明　：Excel配列からテンポラリテーブルへの取込＆メインテーブルへコミットを提供するクラス（汎用版）
+' 作成日：2025/04/25
+' 更新日：再生成 by そうじろう
+'=====================================
+Option Compare Database
+Option Explicit
+
+' --- 内部保持変数 ---
+Private pDB               As DAO.Database
+Private pDictMapping      As Object
+Private pDictValidFields  As Object
+Private pColMapping       As Object
+Private pSkipConditions   As Object
+Private pDefaultValues    As Object
+Private pImportTableName As String
+Private pImportSourceFieldName As String
+Private pImportTargetFieldName As String
+
+
+' --- 公開プロパティ ---
+Public tableName       As String
+Public TempTableName   As String
+Public TitleRow As Long             ' タイトル行（例：5）
+Public DataStartRow As Long        ' データ開始行（例：6）
+Public StartColumn As Long         ' データ開始列（例：2 = B列）
+Public ImportColumnMax As Long      ' 最大列数（設定しない場合は自動判定）
+
+'=================================================
+' サブルーチン名 : Init
+' 機能 : データベース接続（CurrentDb）および各種辞書オブジェクトを初期化するにゃ
+'        項目マッピング、有効フィールド、列マッピング、
+'        スキップ条件、初期値設定の各辞書を作成するにゃ
+'=================================================
+Public Sub Init()
+    Set pDB = CurrentDb
+    Set pDictMapping = CreateObject("Scripting.Dictionary")
+    Set pDictValidFields = CreateObject("Scripting.Dictionary")
+    Set pColMapping = CreateObject("Scripting.Dictionary")
+    
+    Set pSkipConditions = CreateObject("Scripting.Dictionary")
+    Set pDefaultValues = CreateObject("Scripting.Dictionary")
+End Sub
+
+
+'=================================================
+' プロパティ名 : SkipConditions
+' 引数 : val - スキップ条件の辞書（Dictionary）
+' 機能 : スキップ条件の辞書オブジェクトを設定・取得するにゃ
+'=================================================
+Public Property Set SkipConditions(val As Object)
+    Set pSkipConditions = val
+End Property
+
+Public Property Get SkipConditions() As Object
+    Set SkipConditions = pSkipConditions
+End Property
+
+
+
+'=================================================
+' プロパティ名 : DefaultValues
+' 引数 : val - 初期値の辞書（Dictionary）
+' 機能 : 各フィールドの初期値設定を保持する辞書オブジェクトを設定・取得するにゃ
+'=================================================
+Public Property Set DefaultValues(val As Object)
+    Set pDefaultValues = val
+End Property
+
+Public Property Get DefaultValues() As Object
+    Set DefaultValues = pDefaultValues
+End Property
+
+
+'=================================================
+' プロパティ名 : MappingMode
+' 引数 : val - マッピングモード（"タイトル一致", "取込情報テーブル"）
+' 機能 : 取込時の項目マッピング方法を選択して、対応する処理を呼び出すにゃ
+'=================================================
+Public Property Let MappingMode(val As String)
+    Select Case val
+        Case "タイトル一致": Call PrepareMappings_ByTitleMatch_Flexible
+        Case "取込情報テーブル": Call PrepareMappings_ByImportTable
+        Case Else: MsgBox "未対応のMappingMode：" & val, vbCritical
+    End Select
+End Property
+
+
+'=================================================
+' プロパティ名 : fieldNames
+' 引数 : val - タイトル行の配列
+' 機能 : 配列の見出し情報から項目位置を特定して、列マッピングを生成するにゃ
+'=================================================
+Public Property Let fieldNames(val As Variant)
+    PrepareFieldNames val
+End Property
+
+
+'=================================================
+' プロパティ名 : ImportTableName
+' 引数 : val - 取込設定テーブルのテーブル名
+' 機能 : フィールドマッピング用に参照するテーブル名を保持するにゃ
+'=================================================
+Public Property Let ImportTableName(val As String)
+    pImportTableName = val
+End Property
+
+
+'=================================================
+' プロパティ名 : ImportSourceFieldName
+' 引数 : val - マッピング元のフィールド名
+' 機能 : 取込設定テーブル内の、マッピング元の列名を指定するにゃ
+'=================================================
+Public Property Let ImportSourceFieldName(val As String)
+    pImportSourceFieldName = val
+End Property
+
+
+'=================================================
+' プロパティ名 : ImportTargetFieldName
+' 引数 : val - マッピング先のフィールド名
+' 機能 : 取込設定テーブル内の、マッピング先の列名を指定するにゃ
+'=================================================
+Public Property Let ImportTargetFieldName(val As String)
+    pImportTargetFieldName = val
+End Property
+
+
+'=================================================
+' サブルーチン名 : PrepareFieldNames
+' 引数 : val - タイトル行の配列（1行N列）
+' 機能 : 見出しの非空列を抽出し、列位置とマッピングを登録するにゃ
+'=================================================
+Private Sub PrepareFieldNames(val As Variant)
+    Dim i     As Long
+    Dim title As String
+    
+    For i = 1 To ImportColumnMax
+        title = Trim(Nz(val(1, i), ""))
+        
+        If title <> "" Then
+            pColMapping.Add title, i
+        End If
+    Next i
+End Sub
+
+
+'=================================================
+' サブルーチン名 : PrepareMappings_ByTitleMatch_Flexible
+' 機能 : タイトルと同じ値でマッピングを構成するにゃ
+'        （取込対象の列名とテーブルの列名が同一の場合を想定）
+'=================================================
+Private Sub PrepareMappings_ByTitleMatch_Flexible()
+    Dim fld As Variant
+    For Each fld In pColMapping.Items
+        pDictMapping(fld) = fld
+    Next fld
+End Sub
+
+
+'=================================================
+' サブルーチン名 : PrepareMappings_ByImportTable
+' 機能 : 指定された取込設定テーブルからマッピング定義を読み取り、項目名の対応関係を構成するにゃ
+'=================================================
+Private Sub PrepareMappings_ByImportTable()
+    Dim rs As DAO.Recordset
+    Set rs = pDB.OpenRecordset(pImportTableName, dbOpenSnapshot)
+    Do Until rs.EOF
+        pDictMapping(rs.Fields(pImportSourceFieldName).value) = rs.Fields(pImportTargetFieldName).value
+        rs.MoveNext
+    Loop
+    rs.Close
+End Sub
+
+
+'=================================================
+' サブルーチン名 : ImportFromArray
+' 引数 : dataArr - 取込対象の2次元配列（タイトルなし）
+' 機能 : 配列データを行ごとに処理し、スキップ条件と初期値補完を考慮しながら仮テーブルへ登録するにゃ
+'=================================================
+Public Sub ImportFromArray(dataArr As Variant)
+    Dim rs      As DAO.Recordset
+    Set rs = pDB.OpenRecordset(TempTableName, dbOpenDynaset)
+    Dim r       As Long
+    Dim c       As Variant
+    Dim fld     As String
+    Dim valCell As Variant
+
+    For r = 1 To UBound(dataArr, 1)
+        If Not ShouldSkip(dataArr, r) Then
+            rs.AddNew
+            For Each c In pColMapping.Keys
+                fld = pColMapping(c)
+                valCell = dataArr(r, c)
+                If (IsNull(valCell) Or Trim(CStr(valCell)) = "") Then
+                    If Not pDefaultValues Is Nothing Then
+                        If pDefaultValues.Exists(fld) Then _
+                            valCell = pDefaultValues(fld)
+                    End If
+                End If
+                rs.Fields(pDictMapping(fld)).value = valCell
+            Next c
+            rs.Update
+        End If
+    Next r
+    rs.Close
+End Sub
+
+
+'=================================================
+' 関数名 : ShouldSkip
+' 引数 : dataArr - 読み込んだデータ配列
+'        rowIndex - 対象の行番号
+' 機能 : 取込対象データがスキップ条件に一致するかを判定するにゃ
+'=================================================
+Private Function ShouldSkip(dataArr As Variant, rowIndex As Long) As Boolean
+    Dim fn As Variant
+    Dim cell As String
+    Dim patterns As Variant
+    Dim pat As Variant
+
+    ' スキップ条件未設定ならスキップしない
+    If pSkipConditions Is Nothing Then Exit Function
+
+    For Each fn In pSkipConditions.Keys
+        ' ★ 置換後タイトルでマッピングが存在するかチェック！
+        If pColMapping.Exists(fn) Then
+            Set patterns = pSkipConditions(fn)
+
+            ' ★ 配列の該当セルを安全に取得
+            cell = Trim(Nz(dataArr(rowIndex, pColMapping(fn)), ""))
+
+            ' ★ 各パターンと一致するかチェック
+            For Each pat In patterns
+                If cell Like pat Then
+                    ShouldSkip = True
+                    Exit Function
+                End If
+            Next pat
+        Else
+            ' ★ もしマッピングに存在しなければデバッグ出力だけ（処理は続行）
+            Debug.Print "【警告】pColMappingに存在しない列名にゃ: " & fn
+        End If
+    Next fn
+End Function
+
+'=================================================
+' サブルーチン名 : CommitToMain
+' 機能 : 仮テーブル（TempTableName）の内容を本テーブル（tableName）へ一括で登録するにゃ
+'        INSERT INTO ～ SELECT 文を使って、全件コピーする処理にゃ
+'=================================================
+Public Sub CommitToMain()
+    pDB.Execute "INSERT INTO [" & tableName & "] SELECT * FROM [" & TempTableName & "]", dbFailOnError
+End Sub
+
+
+'=================================================
+' サブルーチン名 : ImportFromWorksheet
+' 引数：ws - 取込対象のワークシート（Excel.Worksheet）
+' 機能：指定行列からタイトルとデータを取得し、ImportFromArray に渡す
+'=================================================
+Public Sub ImportFromWorksheet(ws As Object)
+    Dim lastRow As Long
+    Dim lastCol As Long
+    Dim titleArr As Variant
+    Dim dataArr As Variant
+
+    ' --- タイトル読み込み ---
+
+    ' ImportColumnMaxが0なら、タイトル行から列数を自動判定するにゃ！
+    If ImportColumnMax = 0 Then
+        lastCol = ws.Cells(TitleRow, ws.Columns.Count).End(-4159).Column ' xlToLeft
+        ImportColumnMax = lastCol - StartColumn + 1
+    End If
+
+    Set pColMapping = CreateObject("Scripting.Dictionary")
+    titleArr = ws.Range(ws.Cells(TitleRow, StartColumn), ws.Cells(TitleRow, StartColumn + ImportColumnMax - 1)).value
+    fieldNames = titleArr
+
+    ' --- データ最終行取得 ---
+    lastRow = ws.Cells(ws.Rows.Count, StartColumn).End(-4162).row
+
+    ' --- データ読み込み ---
+    dataArr = ws.Range(ws.Cells(DataStartRow, StartColumn), ws.Cells(lastRow, StartColumn + ImportColumnMax - 1)).value
+
+    ' --- 配列から取込実行 ---
+    ImportFromArray dataArr
+End Sub
+
+
+
+
+
